@@ -33,3 +33,4 @@ coverage/
 # Misc
 *.tgz
 .cache/
+docs/BACKEND_TASKS.md
