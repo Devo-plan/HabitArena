@@ -3,6 +3,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { AppModule } from '../src/app.module';
+import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
+import { LoggingInterceptor } from '../src/common/interceptors/logging.interceptor';
+import { RequestIdInterceptor } from '../src/common/interceptors/request-id.interceptor';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -15,6 +18,14 @@ let cachedApp: (req: VercelRequest, res: VercelResponse) => void;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
+  app.useGlobalFilters(new HttpExceptionFilter());
+  // @ts-ignore - RxJS version conflict between root and server node_modules
+  app.useGlobalInterceptors(
+    // @ts-ignore - RxJS version conflict
+    new RequestIdInterceptor(),
+    // @ts-ignore - RxJS version conflict
+    new LoggingInterceptor()
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

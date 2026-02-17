@@ -2,6 +2,9 @@ import * as Sentry from '@sentry/node';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -12,6 +15,14 @@ Sentry.init({
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
+  app.useGlobalFilters(new HttpExceptionFilter());
+  // @ts-ignore - RxJS version conflict between root and server node_modules
+  app.useGlobalInterceptors(
+    // @ts-ignore - RxJS version conflict
+    new RequestIdInterceptor(),
+    // @ts-ignore - RxJS version conflict
+    new LoggingInterceptor()
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
