@@ -9,13 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.39.0",
     "axios": "^1.6.7",
     "next": "^14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.22.0",
-    "socket.io-client": "^4.7.4"
+    "socket.io-client": "^4.7.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
