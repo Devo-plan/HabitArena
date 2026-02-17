@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Optional: Verify token with backend
           // const { data } = await api.get('/auth/me');
           // setUser(data);
-          
+
           // Fallback: Trust local storage for MVP speed
           const storedUser = localStorage.getItem('user');
           if (storedUser) {

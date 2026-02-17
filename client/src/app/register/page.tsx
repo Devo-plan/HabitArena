@@ -1,93 +1,106 @@
 // app/register/page.tsx
-// Add reset() after successful submission
+// Register page with proper TypeScript types - no any, undefined, or null
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { type JSX } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
 import { theme } from '@/styles/theme';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { registerSchema, type RegisterFormData } from '@/utils/validations/auth.schema';
+import { usePasswordToggle } from '@/hooks/usePasswordToggle';
+import { useAuthSubmit } from '@/hooks/useAuthSubmit';
+import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
-export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+// ==================== TYPES ====================
 
-  // ==================== FORM SETUP ====================
+interface RegisterResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
+// ==================== COMPONENT ====================
+
+export default function RegisterPage(): JSX.Element {
+  // ==================== CUSTOM HOOKS ====================
+
+  const passwordToggle = usePasswordToggle();
+  const confirmPasswordToggle = usePasswordToggle();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     watch,
-    reset, // ✅ ADD THIS
+    reset,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
-  // Watch password for strength indicator
-  const password = watch('password');
+  const password = watch('password') ?? '';
+  const passwordStrength = usePasswordStrength(password);
 
-  // ==================== PASSWORD STRENGTH ====================
-  const getPasswordStrength = (pass: string): { strength: string; color: string; width: string } => {
-    if (!pass) return { strength: '', color: '', width: '0%' };
-    
-    let strength = 0;
-    if (pass.length >= 8) strength++;
-    if (/[A-Z]/.test(pass)) strength++;
-    if (/[a-z]/.test(pass)) strength++;
-    if (/[0-9]/.test(pass)) strength++;
-    if (/[^A-Za-z0-9]/.test(pass)) strength++;
+  // ==================== API CALL ====================
 
-    if (strength <= 2) return { strength: 'Weak', color: theme.colors.secondary[500], width: '33%' };
-    if (strength <= 3) return { strength: 'Medium', color: theme.colors.accent.gold, width: '66%' };
-    return { strength: 'Strong', color: theme.colors.accent.emerald, width: '100%' };
+  const registerAPI = async (data: RegisterFormData): Promise<RegisterResponse> => {
+    // Simulate API delay
+    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
+
+    // TODO: Replace with actual API call
+    // const response = await fetch('/api/auth/register', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data),
+    // });
+    // if (!response.ok) throw new Error('Registration failed');
+    // return response.json();
+
+    console.log('Register data:', data);
+
+    return {
+      token: 'mock-jwt-token',
+      user: {
+        id: '123',
+        email: data.email,
+        name: data.name,
+      },
+    };
   };
-
-  const passwordStrength = getPasswordStrength(password);
 
   // ==================== FORM SUBMISSION ====================
-  const onSubmit = async (data: RegisterFormData) => {
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // TODO: Replace with actual API call
-      // const response = await authAPI.register(data);
-      // localStorage.setItem('token', response.token);
-      // router.push('/dashboard');
-      
-      toast.success('Registration successful! Welcome to the arena, warrior! 🔥');
-      console.log('Register data:', data);
-      
-      // ✅ RESET FORM AFTER SUCCESS
+
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
+    successMessage: 'Registration successful! Welcome to the arena, warrior! 🔥',
+    onSuccess: () => {
       reset();
-      setShowPassword(false); // Also hide passwords
-      setShowConfirmPassword(false);
-      
-    } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Registration failed. Please try again.';
-      toast.error(message);
-      console.error('Register error:', error);
-    }
-  };
+      passwordToggle.hide();
+      confirmPasswordToggle.hide();
+      // TODO: Redirect to dashboard
+      // router.push('/dashboard');
+    },
+    onError: (error) => {
+      console.error('Registration failed:', error);
+    },
+  });
+
+  // ==================== RENDER ====================
 
   return (
     <main
       className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden"
-      style={{
-        backgroundColor: theme.colors.background.primary,
-      }}
+      style={{ backgroundColor: theme.colors.background.primary }}
     >
-      {/* Background Effects */}
       <BackgroundEffects />
 
-      {/* Registration Card */}
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-6 sm:mb-8">
@@ -100,7 +113,6 @@ export default function RegisterPage() {
           </h1>
         </div>
 
-        {/* Card */}
         <Card variant="elevated" padding="xl" className="sm:p-8">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
@@ -119,16 +131,13 @@ export default function RegisterPage() {
                 Arena
               </span>
             </h2>
-            <p
-              className="text-sm sm:text-base"
-              style={{ color: theme.colors.text.tertiary }}
-            >
+            <p className="text-sm sm:text-base" style={{ color: theme.colors.text.tertiary }}>
               Build habits like a warrior. Compete with the best.
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
+          <form onSubmit={handleSubmit(submit)} className="space-y-5 sm:space-y-6">
             {/* Name Input */}
             <Input
               {...register('name')}
@@ -138,7 +147,7 @@ export default function RegisterPage() {
               leftIcon={<User size={18} className="sm:w-5 sm:h-5" />}
               error={errors.name?.message}
               autoComplete="name"
-              disabled={isSubmitting}
+              disabled={isLoading}
             />
 
             {/* Email Input */}
@@ -150,38 +159,45 @@ export default function RegisterPage() {
               leftIcon={<Mail size={18} className="sm:w-5 sm:h-5" />}
               error={errors.email?.message}
               autoComplete="email"
-              disabled={isSubmitting}
+              disabled={isLoading}
             />
 
-            {/* Password Input */}
+            {/* Password Input with Strength Indicator */}
             <div>
               <Input
                 {...register('password')}
-                type={showPassword ? 'text' : 'password'}
+                type={passwordToggle.inputType}
                 label="Password"
                 placeholder="Create a strong password"
                 leftIcon={<Lock size={18} className="sm:w-5 sm:h-5" />}
                 rightIcon={
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={passwordToggle.toggle}
                     className="cursor-pointer transition-colors hover:text-white"
-                    disabled={isSubmitting}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    disabled={isLoading}
+                    aria-label={passwordToggle.showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
+                    {passwordToggle.showPassword ? (
+                      <EyeOff size={18} className="sm:w-5 sm:h-5" />
+                    ) : (
+                      <Eye size={18} className="sm:w-5 sm:h-5" />
+                    )}
                   </button>
                 }
                 error={errors.password?.message}
                 autoComplete="new-password"
-                disabled={isSubmitting}
+                disabled={isLoading}
               />
 
               {/* Password Strength Indicator */}
-              {password && !errors.password && (
+              {password.length > 0 && !errors.password && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold" style={{ color: theme.colors.text.muted }}>
+                    <span
+                      className="text-xs font-semibold"
+                      style={{ color: theme.colors.text.muted }}
+                    >
                       Password Strength
                     </span>
                     <span className="text-xs font-bold" style={{ color: passwordStrength.color }}>
@@ -207,24 +223,30 @@ export default function RegisterPage() {
             {/* Confirm Password Input */}
             <Input
               {...register('confirmPassword')}
-              type={showConfirmPassword ? 'text' : 'password'}
+              type={confirmPasswordToggle.inputType}
               label="Confirm Password"
               placeholder="Re-enter your password"
               leftIcon={<Lock size={18} className="sm:w-5 sm:h-5" />}
               rightIcon={
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={confirmPasswordToggle.toggle}
                   className="cursor-pointer transition-colors hover:text-white"
-                  disabled={isSubmitting}
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  disabled={isLoading}
+                  aria-label={
+                    confirmPasswordToggle.showPassword ? 'Hide password' : 'Show password'
+                  }
                 >
-                  {showConfirmPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
+                  {confirmPasswordToggle.showPassword ? (
+                    <EyeOff size={18} className="sm:w-5 sm:h-5" />
+                  ) : (
+                    <Eye size={18} className="sm:w-5 sm:h-5" />
+                  )}
                 </button>
               }
               error={errors.confirmPassword?.message}
               autoComplete="new-password"
-              disabled={isSubmitting}
+              disabled={isLoading}
             />
 
             {/* Submit Button */}
@@ -233,10 +255,16 @@ export default function RegisterPage() {
               variant="gradient"
               size="lg"
               fullWidth
-              disabled={isSubmitting}
-              rightIcon={isSubmitting ? <Loader2 size={18} className="animate-spin sm:w-5 sm:h-5" /> : <ArrowRight size={18} className="sm:w-5 sm:h-5" />}
+              disabled={isLoading}
+              rightIcon={
+                isLoading ? (
+                  <Loader2 size={18} className="animate-spin sm:w-5 sm:h-5" />
+                ) : (
+                  <ArrowRight size={18} className="sm:w-5 sm:h-5" />
+                )
+              }
             >
-              {isSubmitting ? 'Creating Account...' : 'Enter the Arena'}
+              {isLoading ? 'Creating Account...' : 'Enter the Arena'}
             </Button>
           </form>
 
@@ -261,10 +289,10 @@ export default function RegisterPage() {
 
           {/* Social Login */}
           <div className="space-y-3">
-            <Button variant="secondary" size="md" fullWidth disabled={isSubmitting}>
+            <Button variant="secondary" size="md" fullWidth disabled={isLoading}>
               <span className="text-sm sm:text-base">Continue with Google</span>
             </Button>
-            <Button variant="secondary" size="md" fullWidth disabled={isSubmitting}>
+            <Button variant="secondary" size="md" fullWidth disabled={isLoading}>
               <span className="text-sm sm:text-base">Continue with Discord</span>
             </Button>
           </div>
@@ -279,13 +307,13 @@ export default function RegisterPage() {
               href="/login"
               className="font-bold transition-colors inline-block"
               style={{ color: theme.colors.primary[500] }}
-              onMouseEnter={(e) => {
+              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.color = theme.colors.primary[400];
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.currentTarget.style.color = theme.colors.primary[500];
               }}
-              tabIndex={isSubmitting ? -1 : 0}
+              tabIndex={isLoading ? -1 : 0}
             >
               Log In
             </Link>
@@ -295,20 +323,22 @@ export default function RegisterPage() {
         {/* Trust Badges */}
         <div className="flex items-center justify-center gap-4 sm:gap-6 mt-6 sm:mt-8">
           <div className="flex items-center gap-2">
-            <Shield size={14} className="sm:w-4 sm:h-4" style={{ color: theme.colors.accent.steel }} />
-            <span
-              className="text-xs font-semibold"
-              style={{ color: theme.colors.text.muted }}
-            >
+            <Shield
+              size={14}
+              className="sm:w-4 sm:h-4"
+              style={{ color: theme.colors.accent.steel }}
+            />
+            <span className="text-xs font-semibold" style={{ color: theme.colors.text.muted }}>
               Encrypted
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Flame size={14} className="sm:w-4 sm:h-4" style={{ color: theme.colors.primary[500] }} />
-            <span
-              className="text-xs font-semibold"
-              style={{ color: theme.colors.text.muted }}
-            >
+            <Flame
+              size={14}
+              className="sm:w-4 sm:h-4"
+              style={{ color: theme.colors.primary[500] }}
+            />
+            <span className="text-xs font-semibold" style={{ color: theme.colors.text.muted }}>
               127K+ Warriors
             </span>
           </div>
@@ -319,7 +349,8 @@ export default function RegisterPage() {
 }
 
 // ==================== BACKGROUND EFFECTS ====================
-const BackgroundEffects: React.FC = () => {
+
+const BackgroundEffects: React.FC = (): JSX.Element => {
   return (
     <>
       <div

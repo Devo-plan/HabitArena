@@ -1,12 +1,13 @@
 // app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 import { theme } from '@/styles/theme';
-import "@/styles/globals.css";
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
-  title: "HabitArena - Build Habits Like a Warrior",
-  description: "Join live ritual rooms, compete in seasonal leagues, and stake money on your streaks.",
+  title: 'HabitArena - Build Habits Like a Warrior',
+  description:
+    'Join live ritual rooms, compete in seasonal leagues, and stake money on your streaks.',
 };
 
 export default function RootLayout({
@@ -18,9 +19,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        
+
         {/* Toast Notifications */}
-        <Toaster 
+        <Toaster
           position="top-right"
           toastOptions={{
             duration: 4000,

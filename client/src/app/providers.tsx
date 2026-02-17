@@ -7,7 +7,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       {/* <AppProvider> */}
-        {children}
+      {children}
       {/* </AppProvider> */}
     </AuthProvider>
   );
