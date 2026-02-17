@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use 'next/router' if using Pages Router
-import api from '@/services/api'; 
 
 // Define User Type (Based on your backend schema)
 interface User {
