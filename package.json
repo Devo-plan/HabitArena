@@ -4,7 +4,7 @@
   "private": true,
   "description": "HabitArena - Social habit-building platform with ritual rooms, momentum maps, and seasonal challenges",
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "echo Run npm run dev in server/ or client/ to start each separately",
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
     "build": "npm run build --workspace=client",
