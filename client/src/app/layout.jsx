@@ -1,3 +1,4 @@
+import '@/env';
 import '@/app/globals.css';
 
 export const metadata = {
