@@ -13,13 +13,13 @@ export const theme = {
       200: '#fed7aa',
       300: '#fdba74',
       400: '#fb923c',
-      500: '#f97316',  // Main brand - Electric Orange
+      500: '#f97316', // Main brand - Electric Orange
       600: '#ea580c',
       700: '#c2410c',
       800: '#9a3412',
       900: '#7c2d12',
     },
-    
+
     // Secondary Colors (Crimson Red - Competition & Intensity)
     secondary: {
       50: '#fef2f2',
@@ -27,7 +27,7 @@ export const theme = {
       200: '#fecaca',
       300: '#fca5a5',
       400: '#f87171',
-      500: '#ef4444',  // Crimson Red
+      500: '#ef4444', // Crimson Red
       600: '#dc2626',
       700: '#b91c1c',
       800: '#991b1b',
@@ -36,24 +36,24 @@ export const theme = {
 
     // Accent Colors (Steel Blue - Focus & Live Presence)
     accent: {
-      steel: '#06b6d4',      // Steel blue for live indicators
-      gold: '#f59e0b',       // Victory gold for achievements
-      emerald: '#10b981',    // Success green
-      crimson: '#dc2626',    // Rival red
-      orange: '#f97316',     // Energy orange
-      slate: '#64748b',      // Neutral slate
+      steel: '#06b6d4', // Steel blue for live indicators
+      gold: '#f59e0b', // Victory gold for achievements
+      emerald: '#10b981', // Success green
+      crimson: '#dc2626', // Rival red
+      orange: '#f97316', // Energy orange
+      slate: '#64748b', // Neutral slate
     },
 
     // Background Colors (Dark Arena Aesthetic)
     background: {
-      primary: '#0f0f0f',       // Near black - serious tone
-      secondary: '#1a1a1a',     // Dark charcoal
-      tertiary: '#262626',      // Lighter charcoal
-      card: 'rgba(247, 115, 22, 0.03)',  // Subtle orange tint
+      primary: '#0f0f0f', // Near black - serious tone
+      secondary: '#1a1a1a', // Dark charcoal
+      tertiary: '#262626', // Lighter charcoal
+      card: 'rgba(247, 115, 22, 0.03)', // Subtle orange tint
       cardHover: 'rgba(247, 115, 22, 0.08)',
       glass: 'rgba(26, 26, 26, 0.7)',
       hover: 'rgba(247, 115, 22, 0.05)',
-      danger: 'rgba(220, 38, 38, 0.1)',  // Streak warning background
+      danger: 'rgba(220, 38, 38, 0.1)', // Streak warning background
     },
 
     // Text Colors
@@ -62,8 +62,8 @@ export const theme = {
       secondary: '#e5e5e5',
       tertiary: '#a3a3a3',
       muted: '#737373',
-      accent: '#f97316',        // Orange for highlights
-      danger: '#ef4444',        // Red for warnings
+      accent: '#f97316', // Orange for highlights
+      danger: '#ef4444', // Red for warnings
     },
 
     // Border Colors
@@ -76,20 +76,21 @@ export const theme = {
 
     // Gradient Definitions
     gradients: {
-      primary: 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)',  // Orange to Red
+      primary: 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)', // Orange to Red
       secondary: 'linear-gradient(135deg, #06b6d4 0%, #f97316 100%)', // Steel to Orange
       hero: 'linear-gradient(180deg, #ffffff 0%, #a3a3a3 100%)',
       card: 'linear-gradient(135deg, rgba(247, 115, 22, 0.08) 0%, rgba(220, 38, 38, 0.08) 100%)',
       victory: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)', // Gold gradient
-      danger: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',  // Red gradient
+      danger: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)', // Red gradient
     },
 
     // Live Status Colors
     live: {
-      active: '#10b981',        // Green dot - user is live
-      idle: '#f59e0b',          // Yellow - idle/away
-      offline: '#64748b',       // Gray - offline
+      active: '#10b981', // Green dot - user is live
+      idle: '#f59e0b', // Yellow - idle/away
+      offline: '#64748b', // Gray - offline
     },
+    error: '#ef4444',
   },
 
   // ==================== TYPOGRAPHY ====================
@@ -162,7 +163,7 @@ export const theme = {
     lg: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
     xl: '0 20px 25px -5px rgba(0, 0, 0, 0.6)',
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-    
+
     // Themed glows for competition feel
     glow: {
       orange: '0 0 40px rgba(249, 115, 22, 0.5)',
@@ -170,14 +171,14 @@ export const theme = {
       steel: '0 0 40px rgba(6, 182, 212, 0.5)',
       gold: '0 0 40px rgba(245, 158, 11, 0.5)',
     },
-    
+
     // Elevation with darker shadows
     elevation: {
       low: '0 2px 8px rgba(0, 0, 0, 0.3)',
       medium: '0 8px 24px rgba(0, 0, 0, 0.4)',
       high: '0 16px 48px rgba(0, 0, 0, 0.5)',
     },
-    
+
     // Inner shadows for depth
     inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
   },
