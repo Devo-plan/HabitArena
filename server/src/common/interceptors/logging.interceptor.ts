@@ -7,7 +7,7 @@ import { Request } from 'express';
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger('HTTP');
 
-  // @ts-ignore - RxJS version conflict between root and server node_modules
+  // @ts-expect-error - RxJS version conflict between root and server node_modules
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>();
     const { method, url } = request;
@@ -16,9 +16,9 @@ export class LoggingInterceptor implements NestInterceptor {
 
     this.logger.log(`${method} ${url} [${requestId}] - Started`);
 
-    // @ts-ignore - RxJS version conflict between root and server node_modules
+    // @ts-expect-error - RxJS version conflict between root and server node_modules
     return next.handle().pipe(
-      // @ts-ignore - RxJS version conflict
+      // @ts-expect-error - RxJS version conflict
       tap({
         next: () => {
           const duration = Date.now() - startTime;

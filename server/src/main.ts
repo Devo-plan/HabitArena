@@ -16,11 +16,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new HttpExceptionFilter());
-  // @ts-ignore - RxJS version conflict between root and server node_modules
   app.useGlobalInterceptors(
-    // @ts-ignore - RxJS version conflict
+    // @ts-expect-error - RxJS version conflict between root and server node_modules
     new RequestIdInterceptor(),
-    // @ts-ignore - RxJS version conflict
     new LoggingInterceptor()
   );
   app.useGlobalPipes(

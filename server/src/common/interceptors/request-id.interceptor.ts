@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class RequestIdInterceptor implements NestInterceptor {
-  // @ts-ignore - RxJS version conflict between root and server node_modules
+  // @ts-expect-error - RxJS version conflict between root and server node_modules
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
@@ -17,7 +17,7 @@ export class RequestIdInterceptor implements NestInterceptor {
     request.headers['x-request-id'] = requestId;
     response.setHeader('X-Request-ID', requestId);
 
-    // @ts-ignore - RxJS version conflict between root and server node_modules
+    // @ts-expect-error - RxJS version conflict between root and server node_modules
     return next.handle();
   }
 }
