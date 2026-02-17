@@ -9,14 +9,19 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
+    'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
+  },
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
   },
   settings: {
     react: {
@@ -25,7 +30,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['server/**/*.js'],
+      files: ['server/**/*.{js,ts}'],
       env: { node: true, browser: false },
     },
     {

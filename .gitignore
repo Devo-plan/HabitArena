@@ -29,8 +29,9 @@ Thumbs.db
 # Test
 coverage/
 .nyc_output/
+server/coverage/
 
 # Misc
 *.tgz
 .cache/
-docs/BACKEND_TASKS.md
+docs/

@@ -14,4 +14,4 @@ Install dependencies from the project root, then edit `server/.env` with your Mo
 - `src/modules/` – Feature modules (auth, users, rooms, etc.)
 - `src/common/` – Guards, pipes, filters
 
-API base path is `/api/v1`. 
+API base path is `/api/v1`. Do not use `any` type (ESLint: `@typescript-eslint/no-explicit-any`). 
