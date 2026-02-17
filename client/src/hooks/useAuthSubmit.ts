@@ -27,7 +27,7 @@ interface ApiErrorResponse {
   message?: string;
 }
 
-interface UseAuthSubmitOptions<TData, TResult> {
+interface UseAuthSubmitOptions<TResult> {
   onSuccess?: (result: TResult) => void;
   onError?: (error: AuthError) => void;
   successMessage?: string;
@@ -45,7 +45,7 @@ interface UseAuthSubmitReturn<TData> {
 
 export const useAuthSubmit = <TData = Record<string, unknown>, TResult = unknown>(
   apiCall: (data: TData) => Promise<TResult>,
-  options?: UseAuthSubmitOptions<TData, TResult>
+  options?: UseAuthSubmitOptions<TResult>
 ): UseAuthSubmitReturn<TData> => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -58,7 +58,7 @@ export const useAuthSubmit = <TData = Record<string, unknown>, TResult = unknown
       const result = await apiCall(data);
 
       // Show success toast
-      toast.success(options?.successMessage ?? 'Success! Welcome, warrior! ');
+      toast.success(options?.successMessage ?? 'Success! Welcome, warrior! 🔥');
 
       // Call success callback if provided
       if (options?.onSuccess) {
