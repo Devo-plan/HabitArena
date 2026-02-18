@@ -4,21 +4,23 @@ import { Request } from 'express';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-@Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
-    Strategy,
-    'jwt-refresh',
-) {
-    constructor(config: ConfigService) {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: config.get<string>('JWT_REFRESH_SECRET') || 'rt-secret', // fallback for dev
-            passReqToCallback: true,
-        });
-    }
+interface JwtPayload {
+  sub: string;
+  email: string;
+}
 
-    validate(req: Request, payload: any) {
-        const refreshToken = req.get('Authorization')!.replace('Bearer', '').trim();
-        return { ...payload, refreshToken, userId: payload.sub };
-    }
+@Injectable()
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+  constructor(config: ConfigService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: config.get<string>('JWT_REFRESH_SECRET') || 'rt-secret', // fallback for dev
+      passReqToCallback: true,
+    });
+  }
+
+  validate(req: Request, payload: JwtPayload) {
+    const refreshToken = req.get('Authorization')!.replace('Bearer', '').trim();
+    return { ...payload, refreshToken, userId: payload.sub };
+  }
 }
