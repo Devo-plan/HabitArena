@@ -5,6 +5,7 @@
 
 import React, { type JSX } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Added for redirect
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { theme } from '@/styles/theme';
@@ -15,6 +16,7 @@ import { registerSchema, type RegisterFormData } from '@/utils/validations/auth.
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
+import { useAuth } from '@/context/AuthContext'; // Import Auth Context
 import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== TYPES ====================
@@ -31,6 +33,9 @@ interface RegisterResponse {
 // ==================== COMPONENT ====================
 
 export default function RegisterPage(): JSX.Element {
+  const router = useRouter();
+  const { login } = useAuth(); // Destructure login function
+
   // ==================== CUSTOM HOOKS ====================
 
   const passwordToggle = usePasswordToggle();
@@ -56,18 +61,12 @@ export default function RegisterPage(): JSX.Element {
     await new Promise<void>((resolve) => setTimeout(resolve, 2000));
 
     // TODO: Replace with actual API call
-    // const response = await fetch('/api/auth/register', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(data),
-    // });
-    // if (!response.ok) throw new Error('Registration failed');
-    // return response.json();
+    // const response = await fetch('/api/auth/register', { ... });
 
-    console.log('Register data:', data);
+    // Kush's Feedback: Removed console.log for security
 
     return {
-      token: 'mock-jwt-token',
+      token: 'mock-jwt-token-456',
       user: {
         id: '123',
         email: data.email,
@@ -79,16 +78,18 @@ export default function RegisterPage(): JSX.Element {
   // ==================== FORM SUBMISSION ====================
 
   const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
-    successMessage: 'Registration successful! Welcome to the arena, warrior! 🔥',
-    onSuccess: () => {
+    successMessage: 'Registration successful! Welcome to the arena, warrior! ',
+    onSuccess: (response) => {
+      login(response.token, response.user);
+
       reset();
       passwordToggle.hide();
       confirmPasswordToggle.hide();
-      // TODO: Redirect to dashboard
-      // router.push('/dashboard');
+
+      router.push('/dashboard');
     },
-    onError: (error) => {
-      console.error('Registration failed:', error);
+    onError: () => {
+      // Error handling is managed by useAuthSubmit internally (toasts)
     },
   });
 

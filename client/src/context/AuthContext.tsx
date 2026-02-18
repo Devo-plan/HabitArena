@@ -1,82 +1,103 @@
+// client/src/context/AuthContext.tsx
+// Global Authentication State Management
+// Handles user sessions, tokens, and protected route logic
+
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation'; // Use 'next/router' if using Pages Router
+import React, { createContext, useContext, useEffect, useState, type JSX } from 'react';
+import { useRouter } from 'next/navigation';
 
-// Define User Type (Based on your backend schema)
+// ==================== TYPES ====================
+
 interface User {
   id: string;
-  username: string;
+  name: string;
   email: string;
-  avatar?: string;
-  roles?: string[];
 }
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
-  login: (token: string, userData: User) => void;
+  token: string | null;
+  login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean; // Added loading state to prevent flickering
 }
+
+// ==================== CONTEXT ====================
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+// ==================== PROVIDER COMPONENT ====================
+
+export function AuthProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    router.push('/login');
-  }, [router]);
-
+  // Check for existing session on mount
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          // Optional: Verify token with backend
-          // const { data } = await api.get('/auth/me');
-          // setUser(data);
+    const initAuth = () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-          // Fallback: Trust local storage for MVP speed
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          }
-        } catch (error) {
-          console.error('Auth verification failed', error);
-          logout();
+      if (storedToken && storedUser) {
+        try {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+        } catch {
+          // Silent fail: Invalid JSON in storage
+          // Kush's feedback: Avoid raw error logging here
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
         }
       }
       setIsLoading(false);
     };
 
     initAuth();
-  }, [logout]);
+  }, []);
 
-  const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-    router.push('/dashboard');
+  // Login Action: Persist session and update state
+  const login = (newToken: string, newUser: User) => {
+    setToken(newToken);
+    setUser(newUser);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
+  // Logout Action: Clear session and redirect
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        isAuthenticated: !!token,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+// ==================== CUSTOM HOOK ====================
+
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}

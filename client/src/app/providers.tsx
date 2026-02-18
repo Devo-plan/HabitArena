@@ -1,14 +1,24 @@
 'use client';
 
 import { AuthProvider } from '@/context/AuthContext';
-// import { AppProvider } from '@/shared/context/AppContext'; // Uncomment when ready
+import { Toaster } from 'react-hot-toast';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      {/* <AppProvider> */}
       {children}
-      {/* </AppProvider> */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#0f172a',
+            color: '#fff',
+            border: '1px solid #334155',
+          },
+          success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        }}
+      />
     </AuthProvider>
   );
 }
