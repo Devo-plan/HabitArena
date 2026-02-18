@@ -1,4 +1,4 @@
-import './globals.css';
+import '@/styles/globals.css';
 import { Providers } from '@/app/providers'; // <--- The new wrapper
 import type { Metadata } from 'next';
 
