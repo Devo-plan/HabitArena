@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ChallengesModule } from './modules/challenges/challenges.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AppService } from './app.service';
       serverSelectionTimeoutMS: 5000,
       maxPoolSize: 10,
     }),
+    ChallengesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
