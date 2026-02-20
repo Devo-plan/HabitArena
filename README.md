@@ -4,18 +4,18 @@ Social habit-building platform with ritual rooms, momentum maps, and seasonal ch
 
 ## Features
 
-### 🔐 Authentication
+### Authentication
 
 - **Secure Registration & Login**: Password hashing with `bcrypt`.
 - **JWT Authentication**: Access and Refresh token cycle for persistent sessions.
 - **Protected Routes**: Middleware guards for secure API access.
 
-### 👤 User Management
+### User Management
 
 - **Profile Fetching**: Retrieve authenticated user details.
 - **Profile Updates**: Update user information (excluding sensitive credentials).
 
-### 🏗️ Architecture
+### Architecture
 
 - **Monorepo Structure**: Managed with npm workspaces.
 - **Backend (NestJS)**: Modular architecture with TypeScript.

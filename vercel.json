@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/api/index.ts",
-      "use": "@vercel/node"
+  "buildCommand": "node build-server.js || node server/build-server.js || (cd server && npm install && npm run build)",
+  "installCommand": "npm install",
+  "outputDirectory": "public",
+  "framework": null,
+  "functions": {
+    "server/api/index.ts": {
+      "runtime": "@vercel/node"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",

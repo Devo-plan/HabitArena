@@ -1,4 +1,4 @@
-// Sentry client config – runs in browser
+// Sentry client config - runs in browser
 // Add SENTRY_DSN to env to enable. Get DSN from sentry.io
 import * as Sentry from '@sentry/nextjs';
 
