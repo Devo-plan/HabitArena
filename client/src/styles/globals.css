@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+/* Base Reset & Variables */
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 2, 6, 23; /* Slate-950 */
+  --background-end-rgb: 2, 6, 23; /* Slate-950 */
+}
+
+/* Global Styles */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
+    rgb(var(--background-start-rgb));
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+
+  /* Smooth Scrolling for the whole app */
+  scroll-behavior: smooth;
+
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+}
+
+/* Custom Utilities for "Elite" Look */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* UPDATED: Hide Scrollbar but Keep Function */
+  ::-webkit-scrollbar {
+    width: 0px; /* Changed from 8px to 0px */
+    height: 0px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent; /* Changed to transparent */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: transparent; /* Changed to transparent */
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: transparent; /* Changed to transparent */
+  }
+}
+
+/* Hide scrollbar for Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+body {
+  -ms-overflow-style: none;
+}
+
+/* Animation Utilities (Optional but nice for landing page) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
