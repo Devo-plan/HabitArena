@@ -1,4 +1,4 @@
-// Sentry edge config – runs in Edge runtime
+// Sentry edge config - runs in Edge runtime
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({

@@ -17,12 +17,14 @@ interface AuthenticatedRequest extends Request {
     refreshToken?: string;
   };
 }
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

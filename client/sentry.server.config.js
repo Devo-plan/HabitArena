@@ -1,4 +1,4 @@
-// Sentry server config – runs in Node
+// Sentry server config - runs in Node
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({

@@ -37,10 +37,12 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
-    if (!user) throw new BadRequestException('User does not exist');
+    const genericErrorMessage = 'Invalid email or password';
+
+    if (!user) throw new BadRequestException(genericErrorMessage);
 
     const passwordMatches = await bcrypt.compare(loginDto.password, user.passwordHash);
-    if (!passwordMatches) throw new BadRequestException('Invalid credentials');
+    if (!passwordMatches) throw new BadRequestException(genericErrorMessage);
 
     const tokens = await this.getTokens(user._id.toString(), user.email);
     await this.updateRefreshToken(user._id.toString(), tokens.refresh_token);
@@ -78,11 +80,6 @@ export class AuthService {
   }
 
   async getTokens(userId: string, email: string) {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    console.log(
-      '🔹 AuthService Generating Tokens. Secret:',
-      secret ? secret.substring(0, 5) + '...' : 'UNDEFINED'
-    );
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
