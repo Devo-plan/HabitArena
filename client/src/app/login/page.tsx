@@ -15,19 +15,21 @@ import { Card } from '@/components/common/Card';
 import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema';
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
-import { useAuth } from '@/context/AuthContext'; // Import Auth Context
-import { Mail, Lock, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+import { useAuth } from '@/context/AuthContext';
+import { login as loginAPI, type AuthResponse } from '@/api/auth.api';
+import {
+  Mail,
+  Lock,
+  Flame,
+  Shield,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Swords,
+  Target,
+  BicepsFlexed,
+} from 'lucide-react';
 
 // ==================== COMPONENT ====================
 
@@ -49,45 +51,27 @@ export default function LoginPage(): JSX.Element {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  });
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // ==================== API CALL ====================
-
-  const loginAPI = async (data: LoginFormData): Promise<LoginResponse> => {
-    // Simulate API delay
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/auth/login', { ... });
-
-    // Kush's Feedback: Removed console.log(data) for security
-
-    return {
-      token: 'mock-jwt-token-123',
-      user: {
-        id: '123',
-        email: data.email,
-        name: 'Gladiator',
+  // ── Form Submission ────────────────────────────────────────
+  const { submit, isLoading } = useAuthSubmit<LoginFormData, AuthResponse>(
+    async (data) => {
+      // Call the real auth API
+      return await loginAPI(data.email, data.password);
+    },
+    {
+      successMessage: 'Welcome back, warrior! 🔥',
+      onSuccess: (response) => {
+        login(response.token, response.user);
+        reset();
+        hidePassword();
+        router.push('/dashboard');
       },
-    };
-  };
-
-  // ==================== FORM SUBMISSION ====================
-
-  const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Login successful! Welcome back, warrior!',
-    onSuccess: (response) => {
-      login(response.token, response.user);
-      reset();
-      hidePassword();
-      router.push('/dashboard');
-    },
-    onError: () => {
-      // Error handling is managed by useAuthSubmit internally (toasts)
-    },
-  });
+      onError: () => {
+        // Toast error handling managed internally by useAuthSubmit
+      },
+    }
+  );
 
   // ==================== RENDER ====================
 

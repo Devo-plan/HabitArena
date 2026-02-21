@@ -1,28 +1,30 @@
 'use client';
 
-// SidebarFooter.tsx — Profile link pinned at bottom of sidebar
-// TODO: Replace PLACEHOLDER_USER with useAuth() once backend is connected
+// SidebarFooter.tsx — Profile link and logout button pinned at bottom of sidebar
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { ARENA_ROUTES } from '@/shared/constants/routes.constants';
 import { useSidebar } from '@/hooks/useSidebar';
-
-const PLACEHOLDER_USER = {
-  name: 'Warrior',
-  role: 'Arena Member',
-} as const;
+import { useAuth } from '@/context/AuthContext';
 
 export const SidebarFooter = () => {
   const { isCollapsed, isMobile, closeMobile } = useSidebar();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
 
   // FIX: startsWith handles nested profile routes like /profile/edit
   const isActive =
     pathname === ARENA_ROUTES.PROFILE || pathname.startsWith(`${ARENA_ROUTES.PROFILE}/`);
   const showLabels = isMobile || !isCollapsed;
+
+  // Handle logout click
+  const handleLogout = () => {
+    if (isMobile) closeMobile();
+    logout();
+  };
 
   return (
     <div style={{ padding: '0 8px 12px' }}>
@@ -79,7 +81,7 @@ export const SidebarFooter = () => {
                 textOverflow: 'ellipsis',
               }}
             >
-              {PLACEHOLDER_USER.name}
+              {user?.name || 'Warrior'}
             </p>
             <p
               style={{
@@ -88,11 +90,56 @@ export const SidebarFooter = () => {
                 margin: 0,
               }}
             >
-              {PLACEHOLDER_USER.role}
+              {user?.email || 'Arena Member'}
             </p>
           </div>
         )}
       </Link>
+
+      {/* Logout button */}
+      <button
+        onClick={handleLogout}
+        title={!showLabels ? 'Logout' : undefined}
+        className="flex items-center rounded-lg transition-all hover:bg-[rgba(239,68,68,0.08)]"
+        style={{
+          gap: showLabels ? '10px' : '0',
+          padding: showLabels ? '8px 12px' : '9px 0',
+          justifyContent: showLabels ? 'flex-start' : 'center',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          width: '100%',
+          marginTop: '4px',
+        }}
+      >
+        {/* Logout icon — 28×28 circle */}
+        <div
+          style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: theme.borderRadius.full,
+            background: 'rgba(239, 68, 68, 0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <LogOut size={14} color={theme.colors.secondary[500]} />
+        </div>
+
+        {showLabels && (
+          <span
+            style={{
+              fontSize: theme.typography.fontSize.sm,
+              fontWeight: theme.typography.fontWeight.medium,
+              color: theme.colors.secondary[500],
+            }}
+          >
+            Logout
+          </span>
+        )}
+      </button>
     </div>
   );
 };

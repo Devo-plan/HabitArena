@@ -1,4 +1,4 @@
-import { Trophy } from 'lucide-react';
+import Link from 'next/link';
 import { theme } from '@/styles/theme';
 import type { DashboardChallenge, SeasonTier } from '@/shared/types/dashboard.types';
 
@@ -19,18 +19,57 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
   return (
     <div
       style={{
-        background: theme.colors.background.secondary,
-        border: `1px solid ${theme.colors.border.primary}`,
-        borderRadius: theme.borderRadius.xl,
-        padding: '14px 16px',
+        borderRadius: theme.borderRadius['2xl'],
+        border: `1px solid rgba(249, 115, 22, 0.2)`,
+        overflow: 'hidden',
+        background:
+          'linear-gradient(135deg, rgba(30,18,8,0.98) 0%, rgba(45,25,10,0.95) 60%, rgba(249,115,22,0.06) 100%)',
+        padding: '22px 24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '16px',
       }}
     >
-      {/* Header: season tag + tier badge */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
+      {/* Top row: season + tier badge | time left */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: '12px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span
+            style={{
+              fontSize: '11px',
+              color: theme.colors.primary[400],
+              fontWeight: theme.typography.fontWeight.bold,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
+            {challenge.season}
+          </span>
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: theme.typography.fontWeight.bold,
+              color: tierColor,
+              background: `${tierColor}15`,
+              border: `1px solid ${tierColor}40`,
+              borderRadius: theme.borderRadius.full,
+              padding: '2px 10px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {challenge.tier} Tier
+          </span>
+        </div>
+
+        {/* Time left */}
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <p
             style={{
               margin: 0,
@@ -40,84 +79,69 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
               letterSpacing: '0.06em',
             }}
           >
-            {challenge.season}
+            Time Left
           </p>
           <p
             style={{
               margin: '2px 0 0',
-              fontSize: theme.typography.fontSize.base,
-              fontWeight: theme.typography.fontWeight.bold,
+              fontSize: theme.typography.fontSize.xl,
+              fontWeight: theme.typography.fontWeight.black,
               fontFamily: theme.typography.fontFamily.display,
               color: theme.colors.text.primary,
             }}
           >
-            {challenge.name}
+            {challenge.daysRemaining}d 06h
           </p>
         </div>
+      </div>
 
+      {/* Challenge name */}
+      <div>
+        <h3
+          style={{
+            margin: 0,
+            fontSize: theme.typography.fontSize['3xl'],
+            fontWeight: theme.typography.fontWeight.black,
+            fontFamily: theme.typography.fontFamily.display,
+            color: theme.colors.text.primary,
+            lineHeight: 1.1,
+          }}
+        >
+          {challenge.name}
+        </h3>
+        <p
+          style={{
+            margin: '6px 0 0',
+            fontSize: theme.typography.fontSize.sm,
+            color: theme.colors.text.tertiary,
+          }}
+        >
+          You are ranked{' '}
+          <strong style={{ color: theme.colors.primary[400] }}>#{challenge.currentRank}</strong> out
+          of {challenge.totalParticipants.toLocaleString()} participants.
+        </p>
+      </div>
+
+      {/* Progress */}
+      <div>
         <div
           style={{
             display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '5px',
-            padding: '4px 10px',
-            borderRadius: theme.borderRadius.full,
-            background: `${tierColor}18`,
-            border: `1px solid ${tierColor}40`,
+            marginBottom: '8px',
           }}
         >
-          <Trophy size={11} color={tierColor} />
           <span
-            style={{
-              fontSize: '11px',
-              fontWeight: theme.typography.fontWeight.bold,
-              color: tierColor,
-              textTransform: 'capitalize',
-            }}
+            style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.tertiary }}
           >
-            {challenge.tier}
+            Overall Progress
           </span>
-        </div>
-      </div>
-
-      {/* Rank + participant count inline */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span
-          style={{
-            fontSize: '2rem',
-            fontWeight: theme.typography.fontWeight.black,
-            fontFamily: theme.typography.fontFamily.display,
-            background: theme.colors.gradients.primary,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            lineHeight: 1,
-          }}
-        >
-          #{challenge.currentRank}
-        </span>
-        <span style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.muted }}>
-          of {challenge.totalParticipants.toLocaleString()} warriors
-        </span>
-        <span
-          style={{
-            marginLeft: 'auto',
-            fontSize: theme.typography.fontSize.xs,
-            color: theme.colors.text.muted,
-          }}
-        >
-          ⏳ {challenge.daysRemaining}d left
-        </span>
-      </div>
-
-      {/* Progress bar */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-          <span style={{ fontSize: '11px', color: theme.colors.text.muted }}>Progress</span>
           <span
             style={{
-              fontSize: '11px',
-              fontWeight: theme.typography.fontWeight.bold,
+              fontSize: theme.typography.fontSize.lg,
+              fontWeight: theme.typography.fontWeight.black,
+              fontFamily: theme.typography.fontFamily.display,
               color: theme.colors.primary[400],
             }}
           >
@@ -126,8 +150,8 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
         </div>
         <div
           style={{
-            height: '6px',
-            background: theme.colors.background.tertiary,
+            height: '8px',
+            background: 'rgba(255,255,255,0.06)',
             borderRadius: theme.borderRadius.full,
             overflow: 'hidden',
           }}
@@ -138,11 +162,33 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
               width: `${challenge.progressPercent}%`,
               background: theme.colors.gradients.primary,
               borderRadius: theme.borderRadius.full,
-              boxShadow: '0 0 8px rgba(249, 115, 22, 0.45)',
+              boxShadow: '0 0 12px rgba(249,115,22,0.5)',
             }}
           />
         </div>
       </div>
+
+      {/* CTA button */}
+      <Link
+        href="/challenges"
+        className="hover:opacity-90 transition-opacity"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '12px',
+          borderRadius: theme.borderRadius.xl,
+          background: 'rgba(255,255,255,0.08)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          color: theme.colors.text.primary,
+          fontSize: theme.typography.fontSize.sm,
+          fontWeight: theme.typography.fontWeight.semibold,
+          textDecoration: 'none',
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        View Challenge Map
+      </Link>
     </div>
   );
 };

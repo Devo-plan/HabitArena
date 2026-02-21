@@ -22,11 +22,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: theme.colors.background.primary,
-      }}
+      style={{ display: 'flex', minHeight: '100vh', background: theme.colors.background.primary }}
     >
       <Sidebar />
 
@@ -40,7 +36,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           flexDirection: 'column',
         }}
       >
-        {/* ── Mobile top bar (hidden on desktop via md:hidden) ── */}
+        {/* Mobile top bar */}
         <div
           className="flex md:hidden items-center"
           style={{
@@ -54,7 +50,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         >
           <button
             onClick={openMobile}
-            title="Open menu"
             className="hover:bg-[rgba(249,115,22,0.08)] transition-all"
             style={{
               background: 'transparent',
@@ -72,7 +67,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           >
             <Menu size={16} />
           </button>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div
               style={{
@@ -103,8 +97,9 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
         </div>
 
+        {/* Page content — restored top padding */}
         <main
-          className="flex-1 px-5 pt-4 pb-6 md:px-10 md:pt-0 md:pb-10"
+          className="flex-1 px-4 pt-4 pb-6 md:px-8 md:pt-6 md:pb-10"
           style={{ color: theme.colors.text.primary }}
         >
           {children}

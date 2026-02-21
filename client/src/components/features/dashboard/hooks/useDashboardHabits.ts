@@ -1,5 +1,10 @@
 'use client';
 
+// useDashboardHabits.ts — Toggle support added
+// markComplete:   pending/missed → completed (optimistic)
+// markIncomplete: completed → pending (optimistic)
+// Both call through to dashboardService; real API swap is trivial
+
 import { useState, useEffect, useCallback } from 'react';
 import type { DashboardHabit, HabitCompletionStatus } from '@/shared/types/dashboard.types';
 import { dashboardService } from '@/components/features/dashboard/services/dashboard.services';
@@ -8,6 +13,7 @@ export interface UseDashboardHabitsReturn {
   habits: DashboardHabit[];
   isLoading: boolean;
   markComplete: (habitId: string) => Promise<void>;
+  markIncomplete: (habitId: string) => Promise<void>;
 }
 
 export const useDashboardHabits = (): UseDashboardHabitsReturn => {
@@ -24,15 +30,30 @@ export const useDashboardHabits = (): UseDashboardHabitsReturn => {
     void load();
   }, []);
 
-  const markComplete = useCallback(async (habitId: string) => {
-    // Optimistic update — instant UI feedback before server confirms
+  // Optimistically flip status — server call fires in background
+  const setStatus = useCallback((habitId: string, status: HabitCompletionStatus) => {
     setHabits((prev) =>
-      prev.map((h) =>
-        h.id === habitId ? { ...h, completionStatus: 'completed' as HabitCompletionStatus } : h
-      )
+      prev.map((h) => (h.id === habitId ? { ...h, completionStatus: status } : h))
     );
-    await dashboardService.markHabitComplete(habitId);
   }, []);
 
-  return { habits, isLoading, markComplete };
+  const markComplete = useCallback(
+    async (habitId: string) => {
+      setStatus(habitId, 'completed');
+      await dashboardService.markHabitComplete(habitId);
+      // TODO: on API error → revert: setStatus(habitId, previousStatus)
+    },
+    [setStatus]
+  );
+
+  const markIncomplete = useCallback(
+    async (habitId: string) => {
+      setStatus(habitId, 'pending');
+      await dashboardService.markHabitIncomplete(habitId);
+      // TODO: on API error → revert: setStatus(habitId, 'completed')
+    },
+    [setStatus]
+  );
+
+  return { habits, isLoading, markComplete, markIncomplete };
 };

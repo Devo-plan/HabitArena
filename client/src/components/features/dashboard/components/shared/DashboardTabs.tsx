@@ -1,16 +1,9 @@
-import { Flame, Zap, Trophy, type LucideIcon } from 'lucide-react';
-import { theme } from '@/styles/theme';
+import { Flame, Radio, Trophy } from 'lucide-react';
 import type { DashboardTab } from '@/shared/types/dashboard.types';
 
-interface TabItem {
-  id: DashboardTab;
-  label: string;
-  icon: LucideIcon;
-}
-
-const TABS: TabItem[] = [
+const TABS: { id: DashboardTab; label: string; icon: typeof Flame }[] = [
   { id: 'habits', label: 'Habits', icon: Flame },
-  { id: 'live', label: 'Live', icon: Zap },
+  { id: 'live', label: 'Live', icon: Radio },
   { id: 'ranks', label: 'Ranks', icon: Trophy },
 ];
 
@@ -23,12 +16,11 @@ export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) =>
   <div
     style={{
       display: 'flex',
-      borderRadius: theme.borderRadius.xl,
-      background: theme.colors.background.secondary,
-      border: `1px solid ${theme.colors.border.primary}`,
+      background: '#1c1c1e',
+      border: '1px solid rgba(255,255,255,0.07)',
+      borderRadius: '12px',
       padding: '4px',
-      marginBottom: '16px',
-      gap: '4px',
+      gap: '2px',
     }}
   >
     {TABS.map(({ id, label, icon: Icon }) => {
@@ -43,20 +35,19 @@ export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) =>
             alignItems: 'center',
             justifyContent: 'center',
             gap: '6px',
-            padding: '8px 0',
-            borderRadius: theme.borderRadius.lg,
+            padding: '9px 12px',
+            borderRadius: '9px',
             border: 'none',
             cursor: 'pointer',
-            fontSize: theme.typography.fontSize.sm,
-            fontWeight: isActive
-              ? theme.typography.fontWeight.semibold
-              : theme.typography.fontWeight.medium,
-            background: isActive ? theme.colors.gradients.primary : 'transparent',
-            color: isActive ? '#ffffff' : theme.colors.text.tertiary,
-            transition: theme.transitions.base,
+            background: isActive ? '#c2410c' : 'transparent',
+            color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
+            fontSize: '13px',
+            fontWeight: isActive ? 700 : 500,
+            transition: 'all 0.15s ease',
+            boxShadow: isActive ? '0 2px 12px rgba(194,65,12,0.35)' : 'none',
           }}
         >
-          <Icon size={15} />
+          <Icon size={13} />
           {label}
         </button>
       );

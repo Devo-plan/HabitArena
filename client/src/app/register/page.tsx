@@ -16,19 +16,22 @@ import { registerSchema, type RegisterFormData } from '@/utils/validations/auth.
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
-import { useAuth } from '@/context/AuthContext'; // Import Auth Context
-import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface RegisterResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+import { useAuth } from '@/context/AuthContext';
+import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
+import {
+  Mail,
+  Lock,
+  User,
+  Flame,
+  Shield,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Zap,
+  TrendingUp,
+  Trophy,
+} from 'lucide-react';
 
 // ==================== COMPONENT ====================
 
@@ -54,46 +57,23 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  // ==================== API CALL ====================
-
-  const registerAPI = async (data: RegisterFormData): Promise<RegisterResponse> => {
-    // Simulate API delay
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/auth/register', { ... });
-
-    // Kush's Feedback: Removed console.log for security
-
-    return {
-      token: 'mock-jwt-token-456',
-      user: {
-        id: '123',
-        email: data.email,
-        name: data.name,
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthResponse>(
+    async (data) => {
+      // Call the real auth API
+      return await registerAPI(data.email, data.password, data.name);
+    },
+    {
+      successMessage: 'Welcome to the arena, warrior! 🔥',
+      onSuccess: (response) => {
+        login(response.token, response.user);
+        reset();
+        passwordToggle.hide();
+        confirmPasswordToggle.hide();
+        router.push('/dashboard');
       },
-    };
-  };
-
-  // ==================== FORM SUBMISSION ====================
-
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
-    successMessage: 'Registration successful! Welcome to the arena, warrior! ',
-    onSuccess: (response) => {
-      login(response.token, response.user);
-
-      reset();
-      passwordToggle.hide();
-      confirmPasswordToggle.hide();
-
-      router.push('/dashboard');
-    },
-    onError: () => {
-      // Error handling is managed by useAuthSubmit internally (toasts)
-    },
-  });
-
-  // ==================== RENDER ====================
+      onError: () => {},
+    }
+  );
 
   return (
     <main

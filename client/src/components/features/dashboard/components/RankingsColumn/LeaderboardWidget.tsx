@@ -2,6 +2,20 @@ import { Flame } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import type { DashboardLeaderboardEntry } from '@/shared/types/dashboard.types';
 
+const RANK_BG: Record<number, string> = {
+  1: theme.colors.gradients.primary,
+  2: 'rgba(148,163,184,0.2)',
+  3: 'rgba(205,127,50,0.2)',
+};
+
+const AVATAR_COLORS = [
+  theme.colors.primary[500],
+  theme.colors.accent.steel,
+  theme.colors.accent.gold,
+  theme.colors.accent.emerald,
+];
+const getAvatarColor = (s: string) => AVATAR_COLORS[s.charCodeAt(0) % AVATAR_COLORS.length];
+
 interface LeaderboardWidgetProps {
   leaderboard: DashboardLeaderboardEntry[];
 }
@@ -15,54 +29,65 @@ export const LeaderboardWidget = ({ leaderboard }: LeaderboardWidgetProps) => {
       style={{
         background: theme.colors.background.secondary,
         border: `1px solid ${theme.colors.border.primary}`,
-        borderRadius: theme.borderRadius.xl,
+        borderRadius: theme.borderRadius['2xl'],
         overflow: 'hidden',
       }}
     >
-      {topEntries.map((entry, index) => (
+      {topEntries.map((entry) => (
         <div
           key={entry.rank}
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: '9px 14px',
+            padding: '12px 16px',
+            gap: '12px',
             borderBottom: `1px solid ${theme.colors.border.primary}`,
-            gap: '10px',
           }}
         >
-          {/* Rank number */}
-          <span
+          {/* Rank badge */}
+          <div
             style={{
-              width: '22px',
-              fontSize: theme.typography.fontSize.xs,
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: RANK_BG[entry.rank] ?? theme.colors.background.tertiary,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
               fontWeight: theme.typography.fontWeight.extrabold,
-              fontFamily: theme.typography.fontFamily.display,
-              color: index < 3 ? theme.colors.primary[400] : theme.colors.text.muted,
+              color: entry.rank <= 3 ? '#ffffff' : theme.colors.text.muted,
               flexShrink: 0,
-              textAlign: 'center',
             }}
           >
             {entry.rank}
-          </span>
+          </div>
 
-          {/* Small avatar dot */}
+          {/* Avatar circle */}
           <div
             style={{
-              width: '6px',
-              height: '6px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
-              background: index < 3 ? theme.colors.primary[500] : theme.colors.background.tertiary,
-              border: `1px solid ${theme.colors.border.primary}`,
+              background: getAvatarColor(entry.initials),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: theme.typography.fontWeight.bold,
+              color: '#ffffff',
               flexShrink: 0,
             }}
-          />
+          >
+            {entry.initials}
+          </div>
 
           {/* Name */}
           <span
             style={{
               flex: 1,
-              fontSize: theme.typography.fontSize.xs,
-              fontWeight: theme.typography.fontWeight.medium,
+              fontSize: theme.typography.fontSize.sm,
+              fontWeight: theme.typography.fontWeight.semibold,
               color: theme.colors.text.secondary,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -78,13 +103,13 @@ export const LeaderboardWidget = ({ leaderboard }: LeaderboardWidgetProps) => {
               display: 'flex',
               alignItems: 'center',
               gap: '3px',
-              fontSize: '11px',
-              color: theme.colors.primary[400],
+              fontSize: '12px',
+              color: theme.colors.text.tertiary,
               fontWeight: theme.typography.fontWeight.semibold,
               flexShrink: 0,
             }}
           >
-            <Flame size={10} fill={theme.colors.primary[400]} />
+            <Flame size={11} color={theme.colors.primary[400]} fill={theme.colors.primary[400]} />
             {entry.streakDays}d
           </span>
         </div>
@@ -93,13 +118,13 @@ export const LeaderboardWidget = ({ leaderboard }: LeaderboardWidgetProps) => {
       {/* Separator */}
       <div
         style={{
-          padding: '3px 14px',
+          padding: '6px 16px',
           background: theme.colors.background.primary,
           textAlign: 'center',
           borderBottom: `1px solid ${theme.colors.border.primary}`,
         }}
       >
-        <span style={{ fontSize: '9px', color: theme.colors.text.muted, letterSpacing: '0.2em' }}>
+        <span style={{ fontSize: '10px', color: theme.colors.text.muted, letterSpacing: '0.25em' }}>
           • • •
         </span>
       </div>
@@ -110,58 +135,67 @@ export const LeaderboardWidget = ({ leaderboard }: LeaderboardWidgetProps) => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            padding: '9px 14px',
-            gap: '10px',
-            background: 'rgba(249, 115, 22, 0.07)',
+            padding: '12px 16px',
+            gap: '12px',
+            background: 'rgba(249,115,22,0.07)',
           }}
         >
-          <span
+          <div
             style={{
-              width: '22px',
-              fontSize: theme.typography.fontSize.xs,
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: theme.colors.gradients.primary,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
               fontWeight: theme.typography.fontWeight.extrabold,
-              fontFamily: theme.typography.fontFamily.display,
-              color: theme.colors.primary[400],
+              color: '#ffffff',
               flexShrink: 0,
-              textAlign: 'center',
             }}
           >
             {currentUser.rank}
-          </span>
-
+          </div>
           <div
             style={{
-              width: '6px',
-              height: '6px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
-              background: theme.colors.primary[500],
+              background: theme.colors.gradients.primary,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: theme.typography.fontWeight.bold,
+              color: '#ffffff',
               flexShrink: 0,
             }}
-          />
-
+          >
+            {currentUser.initials}
+          </div>
           <span
             style={{
               flex: 1,
-              fontSize: theme.typography.fontSize.xs,
+              fontSize: theme.typography.fontSize.sm,
               fontWeight: theme.typography.fontWeight.bold,
               color: theme.colors.primary[400],
             }}
           >
             {currentUser.warriorName}
           </span>
-
           <span
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '3px',
-              fontSize: '11px',
+              fontSize: '12px',
               color: theme.colors.primary[400],
               fontWeight: theme.typography.fontWeight.bold,
               flexShrink: 0,
             }}
           >
-            <Flame size={10} fill={theme.colors.primary[400]} />
+            <Flame size={11} color={theme.colors.primary[400]} fill={theme.colors.primary[400]} />
             {currentUser.streakDays}d
           </span>
         </div>
