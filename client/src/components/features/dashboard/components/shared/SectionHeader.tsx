@@ -2,63 +2,66 @@ import { theme } from '@/styles/theme';
 
 interface SectionHeaderProps {
   title: string;
+  subtitle?: string;
   actionLabel?: string;
   onAction?: () => void;
 }
 
-export const SectionHeader = ({ title, actionLabel, onAction }: SectionHeaderProps) => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: '12px',
-      paddingBottom: '10px',
-      borderBottom: `1px solid ${theme.colors.border.primary}`,
-    }}
-  >
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      {/* Orange accent mark */}
-      <div
-        style={{
-          width: '3px',
-          height: '14px',
-          borderRadius: '2px',
-          background: theme.colors.gradients.primary,
-          flexShrink: 0,
-        }}
-      />
-      <h2
-        style={{
-          margin: 0,
-          fontSize: '11px',
-          fontWeight: theme.typography.fontWeight.extrabold,
-          fontFamily: theme.typography.fontFamily.display,
-          color: theme.colors.text.tertiary,
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-        }}
-      >
-        {title}
-      </h2>
-    </div>
+export const SectionHeader = ({ title, subtitle, actionLabel, onAction }: SectionHeaderProps) => (
+  <div style={{ marginBottom: '14px' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: '8px',
+      }}
+    >
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: '16px',
+            fontWeight: 700,
+            fontFamily: theme.typography.fontFamily.display,
+            color: '#ffffff',
+            lineHeight: 1.2,
+          }}
+        >
+          {title}
+        </h2>
+        {subtitle && (
+          <p
+            style={{
+              margin: '2px 0 0',
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.38)',
+              lineHeight: 1.4,
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
+      </div>
 
-    {actionLabel && (
-      <button
-        onClick={onAction}
-        style={{
-          fontSize: theme.typography.fontSize.xs,
-          color: theme.colors.primary[500],
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          fontWeight: theme.typography.fontWeight.semibold,
-          padding: 0,
-          transition: theme.transitions.base,
-        }}
-      >
-        {actionLabel} →
-      </button>
-    )}
+      {actionLabel && (
+        <button
+          onClick={onAction}
+          style={{
+            fontSize: '12px',
+            color: theme.colors.primary[500],
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 600,
+            padding: 0,
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          {actionLabel} →
+        </button>
+      )}
+    </div>
   </div>
 );

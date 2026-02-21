@@ -1,90 +1,76 @@
-import { type ReactNode } from 'react';
 import { theme } from '@/styles/theme';
 import { SkeletonBlock } from '../shared';
 
 interface StatPillProps {
-  icon: ReactNode;
-  value: string | number;
   label: string;
-  isHighlight?: boolean;
+  value: string | number;
+  subLabel: string;
+  subLabelColor?: string;
   isLoading?: boolean;
 }
 
 export const StatPill = ({
-  icon,
-  value,
   label,
-  isHighlight = false,
+  value,
+  subLabel,
+  subLabelColor = theme.colors.text.muted,
   isLoading = false,
 }: StatPillProps) => {
   if (isLoading) {
-    return <SkeletonBlock height="44px" borderRadius={theme.borderRadius.xl} />;
+    return <SkeletonBlock height="78px" borderRadius="12px" />;
   }
 
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '9px',
-        // Reduced from '10px 14px' — fits the 64px bar height cleanly
-        padding: '7px 12px',
-        borderRadius: theme.borderRadius.xl,
-        background: isHighlight ? 'rgba(249, 115, 22, 0.1)' : theme.colors.background.tertiary,
-        border: `1px solid ${
-          isHighlight ? 'rgba(249, 115, 22, 0.3)' : theme.colors.border.primary
-        }`,
-        boxShadow: isHighlight ? '0 0 18px rgba(249, 115, 22, 0.12)' : 'none',
+        padding: '16px 18px',
+        borderRadius: '12px',
+        background: '#1c1c1e',
+        border: '1px solid rgba(255,255,255,0.06)',
         flex: 1,
         minWidth: 0,
       }}
     >
-      {/* Icon box — 26×26 (reduced from 30×30) */}
-      <div
+      {/* Uppercase label */}
+      <p
         style={{
-          width: '26px',
-          height: '26px',
-          borderRadius: theme.borderRadius.md,
-          background: isHighlight
-            ? theme.colors.gradients.primary
-            : theme.colors.background.secondary,
-          border: isHighlight ? 'none' : `1px solid ${theme.colors.border.primary}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
+          margin: 0,
+          fontSize: '10px',
+          fontWeight: 700,
+          color: 'rgba(255,255,255,0.35)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          marginBottom: '7px',
         }}
       >
-        {icon}
-      </div>
+        {label}
+      </p>
 
-      {/* Value + label stack */}
-      <div style={{ minWidth: 0, overflow: 'hidden' }}>
-        <p
+      {/* Value + inline sub-label */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <span
           style={{
-            margin: 0,
-            fontSize: theme.typography.fontSize.base,
-            fontWeight: theme.typography.fontWeight.extrabold,
+            fontSize: '22px',
+            fontWeight: 800,
             fontFamily: theme.typography.fontFamily.display,
-            color: isHighlight ? theme.colors.primary[400] : theme.colors.text.primary,
-            lineHeight: 1.15,
+            color: '#ffffff',
+            lineHeight: 1,
             whiteSpace: 'nowrap',
           }}
         >
           {typeof value === 'number' ? value.toLocaleString() : value}
-        </p>
-        <p
+        </span>
+        <span
           style={{
-            margin: 0,
-            fontSize: '10px',
-            color: theme.colors.text.muted,
-            fontWeight: theme.typography.fontWeight.medium,
+            fontSize: '13px',
+            fontWeight: 600,
+            color: subLabelColor,
             whiteSpace: 'nowrap',
-            lineHeight: 1.2,
+            lineHeight: 1,
           }}
         >
-          {label}
-        </p>
+          {subLabel}
+        </span>
       </div>
     </div>
   );

@@ -18,52 +18,48 @@ export const LiveActivityColumn = () => {
   return (
     <div
       style={{
-        // Panel styling
-        background: 'rgba(26, 26, 26, 0.5)',
-        border: '1px solid rgba(249, 115, 22, 0.07)',
+        background: 'rgba(26,26,26,0.5)',
+        border: `1px solid ${theme.colors.border.primary}`,
         borderRadius: theme.borderRadius['2xl'],
-        padding: '16px',
-        // Fill the full CSS Grid cell height
+        padding: '20px',
         height: '100%',
         boxSizing: 'border-box',
-        // Internal layout
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: '28px',
       }}
     >
-      {/* ── Active Rooms ── */}
       <section>
-        <SectionHeader title="Active Rooms" actionLabel="View All" />
+        <SectionHeader
+          title="Active Rooms"
+          subtitle="Join others in focused sessions"
+          actionLabel="View All"
+        />
         {roomsLoading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <SkeletonBlock height="88px" />
-            <SkeletonBlock height="88px" />
-            <SkeletonBlock height="88px" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <SkeletonBlock height="120px" />
+            <SkeletonBlock height="120px" />
           </div>
         ) : (
           <ActiveRoomsWidget rooms={rooms} />
         )}
       </section>
 
-      {/* ── Your Challenge ── */}
       <section>
-        <SectionHeader title="Your Challenge" />
         {challengeLoading ? (
-          <SkeletonBlock height="148px" />
+          <SkeletonBlock height="240px" />
         ) : (
           <ChallengeProgressCard challenge={challenge} />
         )}
       </section>
 
-      {/* ── Squad Activity ── */}
       <section>
         <div
           style={{
             background: theme.colors.background.secondary,
             border: `1px solid ${theme.colors.border.primary}`,
-            borderRadius: theme.borderRadius.xl,
-            padding: '12px 14px',
+            borderRadius: theme.borderRadius['2xl'],
+            padding: '18px 20px',
           }}
         >
           <SectionHeader title="Squad Activity" />
@@ -79,7 +75,6 @@ export const LiveActivityColumn = () => {
         </div>
       </section>
 
-      {/* ── Recent Proofs ── */}
       <section>
         <SectionHeader title="Recent Proofs" actionLabel="View All" />
         {squadLoading ? <SkeletonBlock height="208px" /> : <ProofGallery proofs={proofs} />}

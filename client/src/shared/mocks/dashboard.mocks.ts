@@ -13,7 +13,9 @@ export const MOCK_HERO_STATS: HeroStats = {
   currentStreak: 21,
   activeHabits: 6,
   globalRank: 347,
+  rankPercentile: 'Top 5%',
   totalXP: 12480,
+  xpToday: 240,
   activeRooms: 3,
 };
 
@@ -36,19 +38,19 @@ export const MOCK_HABITS: DashboardHabit[] = [
   },
   {
     id: 'h3',
+    name: 'Read 30 mins',
+    streak: 30,
+    completionStatus: 'pending',
+    nextDueTime: 'Today 9:00 PM',
+    category: 'Growth',
+  },
+  {
+    id: 'h4',
     name: 'Cold Shower',
     streak: 7,
     completionStatus: 'pending',
     nextDueTime: 'Today 7:30 AM',
     category: 'Discipline',
-  },
-  {
-    id: 'h4',
-    name: 'Read 30 mins',
-    streak: 30,
-    completionStatus: 'completed',
-    nextDueTime: 'Tomorrow 9:00 PM',
-    category: 'Growth',
   },
   {
     id: 'h5',
@@ -68,7 +70,8 @@ export const MOCK_ROOMS: DashboardRoom[] = [
     warriorCount: 12,
     maxCapacity: 20,
     hostName: 'Kush',
-    topic: 'Focus',
+    topic: 'Focus & Study',
+    participantAvatars: ['KU', 'AX', 'PR'],
   },
   {
     id: 'r2',
@@ -77,7 +80,8 @@ export const MOCK_ROOMS: DashboardRoom[] = [
     warriorCount: 8,
     maxCapacity: 15,
     hostName: 'Yash',
-    topic: 'Fitness',
+    topic: 'Physical Fitness',
+    participantAvatars: ['YA', 'RA', 'SN'],
   },
   {
     id: 'r3',
@@ -87,6 +91,7 @@ export const MOCK_ROOMS: DashboardRoom[] = [
     maxCapacity: 10,
     hostName: 'ArenaX',
     topic: 'Study',
+    participantAvatars: ['AX', 'KU'],
   },
 ];
 
@@ -94,11 +99,11 @@ export const MOCK_CHALLENGE: DashboardChallenge = {
   id: 'c1',
   name: 'Winter Warrior',
   tier: 'gold',
+  season: 'Season 3',
   currentRank: 42,
   totalParticipants: 2847,
   progressPercent: 68,
   daysRemaining: 14,
-  season: 'Season 3',
 };
 
 export const MOCK_SQUAD_FEED: DashboardSquadFeedItem[] = [
@@ -150,15 +155,33 @@ export const MOCK_SQUAD_FEED: DashboardSquadFeedItem[] = [
 ];
 
 export const MOCK_LEADERBOARD: DashboardLeaderboardEntry[] = [
-  { rank: 1, warriorName: 'FireStreak99', streakDays: 180, xp: 48200, isCurrentUser: false },
-  { rank: 2, warriorName: 'Kush', streakDays: 156, xp: 41800, isCurrentUser: false },
-  { rank: 3, warriorName: 'ArenaKing', streakDays: 142, xp: 38900, isCurrentUser: false },
-  { rank: 4, warriorName: 'NightRunner', streakDays: 130, xp: 35400, isCurrentUser: false },
-  { rank: 5, warriorName: 'SteelMind', streakDays: 118, xp: 31200, isCurrentUser: false },
-  { rank: 347, warriorName: 'You', streakDays: 21, xp: 12480, isCurrentUser: true },
+  {
+    rank: 1,
+    warriorName: 'FireStreak99',
+    streakDays: 180,
+    xp: 48200,
+    isCurrentUser: false,
+    initials: 'FS',
+  },
+  {
+    rank: 2,
+    warriorName: 'Kush',
+    streakDays: 156,
+    xp: 41800,
+    isCurrentUser: false,
+    initials: 'KU',
+  },
+  {
+    rank: 3,
+    warriorName: 'ArenaKing',
+    streakDays: 142,
+    xp: 38900,
+    isCurrentUser: false,
+    initials: 'AK',
+  },
+  { rank: 347, warriorName: 'You', streakDays: 21, xp: 12480, isCurrentUser: true, initials: 'YO' },
 ];
 
-// Deterministic 30-day pattern — consistent across renders, no random flicker
 const MOMENTUM_PATTERN: Array<0 | 1 | 2 | 3 | 4> = [
   4, 4, 3, 4, 4, 2, 0, 4, 4, 4, 3, 4, 0, 0, 4, 4, 3, 4, 4, 4, 2, 4, 4, 4, 3, 0, 4, 4, 4, 4,
 ];

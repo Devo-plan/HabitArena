@@ -1,18 +1,16 @@
-// ── Status Unions ────────────────────────────────────────────────────
-
 export type HabitCompletionStatus = 'completed' | 'pending' | 'missed';
 export type RoomStatus = 'live' | 'starting_soon';
 export type SeasonTier = 'bronze' | 'silver' | 'gold' | 'diamond';
 export type ProofMediaType = 'image' | 'text';
 export type DashboardTab = 'habits' | 'live' | 'ranks';
 
-// ── Data Shapes ──────────────────────────────────────────────────────
-
 export interface HeroStats {
   currentStreak: number;
   activeHabits: number;
   globalRank: number;
+  rankPercentile: string; // e.g. 'Top 5%'
   totalXP: number;
+  xpToday: number; // e.g. +240 today
   activeRooms: number;
 }
 
@@ -33,6 +31,7 @@ export interface DashboardRoom {
   maxCapacity: number;
   hostName: string;
   topic: string;
+  participantAvatars: string[]; // initials of first 3 visible participants
 }
 
 export interface DashboardChallenge {
@@ -62,12 +61,11 @@ export interface DashboardLeaderboardEntry {
   streakDays: number;
   xp: number;
   isCurrentUser: boolean;
+  initials: string; // for avatar circle
 }
 
-// level 0–4 drives heatmap color intensity in MomentumMap
-// 0 = no activity, 4 = peak streak strength
 export interface MomentumDay {
-  date: string; // ISO format: 'YYYY-MM-DD'
+  date: string;
   count: number;
   level: 0 | 1 | 2 | 3 | 4;
 }

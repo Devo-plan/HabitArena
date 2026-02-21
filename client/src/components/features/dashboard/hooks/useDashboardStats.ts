@@ -8,7 +8,9 @@ const DEFAULT_STATS: HeroStats = {
   currentStreak: 0,
   activeHabits: 0,
   globalRank: 0,
+  rankPercentile: '',
   totalXP: 0,
+  xpToday: 0,
   activeRooms: 0,
 };
 
