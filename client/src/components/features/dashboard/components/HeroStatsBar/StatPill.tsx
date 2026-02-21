@@ -18,7 +18,7 @@ export const StatPill = ({
   isLoading = false,
 }: StatPillProps) => {
   if (isLoading) {
-    return <SkeletonBlock height="52px" borderRadius={theme.borderRadius.xl} />;
+    return <SkeletonBlock height="44px" borderRadius={theme.borderRadius.xl} />;
   }
 
   return (
@@ -26,23 +26,24 @@ export const StatPill = ({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
-        padding: '10px 14px',
+        gap: '9px',
+        // Reduced from '10px 14px' — fits the 64px bar height cleanly
+        padding: '7px 12px',
         borderRadius: theme.borderRadius.xl,
         background: isHighlight ? 'rgba(249, 115, 22, 0.1)' : theme.colors.background.tertiary,
         border: `1px solid ${
           isHighlight ? 'rgba(249, 115, 22, 0.3)' : theme.colors.border.primary
         }`,
-        boxShadow: isHighlight ? '0 0 20px rgba(249, 115, 22, 0.12)' : 'none',
+        boxShadow: isHighlight ? '0 0 18px rgba(249, 115, 22, 0.12)' : 'none',
         flex: 1,
         minWidth: 0,
       }}
     >
-      {/* Icon box — 30×30 */}
+      {/* Icon box — 26×26 (reduced from 30×30) */}
       <div
         style={{
-          width: '30px',
-          height: '30px',
+          width: '26px',
+          height: '26px',
           borderRadius: theme.borderRadius.md,
           background: isHighlight
             ? theme.colors.gradients.primary
@@ -57,12 +58,12 @@ export const StatPill = ({
         {icon}
       </div>
 
-      {/* Value + label */}
+      {/* Value + label stack */}
       <div style={{ minWidth: 0, overflow: 'hidden' }}>
         <p
           style={{
             margin: 0,
-            fontSize: theme.typography.fontSize.lg,
+            fontSize: theme.typography.fontSize.base,
             fontWeight: theme.typography.fontWeight.extrabold,
             fontFamily: theme.typography.fontFamily.display,
             color: isHighlight ? theme.colors.primary[400] : theme.colors.text.primary,
