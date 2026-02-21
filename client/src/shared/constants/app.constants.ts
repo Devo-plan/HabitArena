@@ -4,7 +4,7 @@
 
 export const APP_NAME = 'HabitArena';
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 // Sidebar layout dimensions
 // FIX: Centralised here to eliminate the hardcoded value mismatch bug
