@@ -7,9 +7,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Squad, SquadDocument } from './schemas/squad.schema';
+import { User } from '../users/schemas/user.schema';
 import { CreateSquadDto } from './dto/create-squad.dto';
 import { JoinSquadDto } from './dto/join-squad.dto';
 import * as crypto from 'crypto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class SquadsService {
@@ -34,17 +36,17 @@ export class SquadsService {
     return newSquad.save();
   }
 
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<SquadDocument[]> {
     // Exclude inviteCode from public listing
     const squads = await this.squadModel
       .find()
       .populate('admin', 'displayName email')
       .select('-inviteCode')
       .exec();
-    return squads;
+    return squads as unknown as SquadDocument[];
   }
 
-  async findOne(id: string, requesterId: string): Promise<any> {
+  async findOne(id: string, requesterId: string): Promise<Partial<Squad>> {
     const squad = await this.squadModel
       .findById(id)
       .populate('admin', 'displayName email')
@@ -56,15 +58,12 @@ export class SquadsService {
     }
 
     // Convert to object to manipulate visibility
-    const squadObj = squad.toObject();
+    const squadObj = squad.toObject() as Squad & { _id: Types.ObjectId };
 
     // Only show inviteCode to the admin
-    if (
-      squad.admin &&
-      (squad.admin as any)._id.toString() !== requesterId &&
-      (squad.admin as any) !== requesterId
-    ) {
-      delete (squadObj as any).inviteCode;
+    const admin = squad.admin as unknown as { _id: Types.ObjectId };
+    if (admin && admin._id.toString() !== requesterId) {
+      delete (squadObj as Partial<Squad>).inviteCode;
     }
 
     return squadObj;
@@ -76,11 +75,16 @@ export class SquadsService {
       throw new NotFoundException(`Squad with invite code ${joinSquadDto.inviteCode} not found`);
     }
 
-    if (squad.members.some((memberId: any) => memberId.toString() === userId)) {
+    const isMember = squad.members.some((member) => {
+      const memberId = (member as unknown as { _id?: Types.ObjectId })?._id || member;
+      return memberId.toString() === userId;
+    });
+
+    if (isMember) {
       throw new ConflictException('User is already a member of this squad');
     }
 
-    squad.members.push(userId as any);
+    squad.members.push(userId as unknown as User);
     return squad.save();
   }
 
