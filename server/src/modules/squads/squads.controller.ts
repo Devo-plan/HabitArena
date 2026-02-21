@@ -2,8 +2,10 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -26,8 +28,17 @@ export class SquadsController {
   }
 
   @Get()
-  findAll() {
-    return this.squadsService.findAll();
+  findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return this.squadsService.findAll(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10
+    );
+  }
+
+  @Post('join')
+  @HttpCode(HttpStatus.OK)
+  join(@Body() joinSquadDto: JoinSquadDto, @CurrentUser() user: CurrentUserPayload) {
+    return this.squadsService.join(joinSquadDto, user.userId);
   }
 
   @Get(':id')
@@ -35,9 +46,15 @@ export class SquadsController {
     return this.squadsService.findOne(id, user.userId);
   }
 
-  @Post('join')
-  @HttpCode(HttpStatus.OK)
-  join(@Body() joinSquadDto: JoinSquadDto, @CurrentUser() user: CurrentUserPayload) {
-    return this.squadsService.join(joinSquadDto, user.userId);
+  @Post(':id/leave')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  leave(@Param('id') id: string, @CurrentUser() user: CurrentUserPayload) {
+    return this.squadsService.leave(id, user.userId);
+  }
+
+  @Delete(':id/members')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeSelf(@Param('id') id: string, @CurrentUser() user: CurrentUserPayload) {
+    return this.squadsService.leave(id, user.userId);
   }
 }

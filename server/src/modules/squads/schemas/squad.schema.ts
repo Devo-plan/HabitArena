@@ -20,3 +20,6 @@ export class Squad {
 }
 
 export const SquadSchema = SchemaFactory.createForClass(Squad);
+
+// Add index for members field to optimize common queries
+SquadSchema.index({ members: 1 });
