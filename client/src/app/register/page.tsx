@@ -26,20 +26,7 @@ import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
 import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
-import {
-  Mail,
-  Lock,
-  User,
-  Flame,
-  Shield,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Zap,
-  TrendingUp,
-  Trophy,
-} from 'lucide-react';
+import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== PAGE ====================
 
@@ -286,17 +273,17 @@ export default function RegisterPage(): JSX.Element {
 const LeftBrandingPanel: React.FC = (): JSX.Element => {
   const features: Array<{ icon: JSX.Element; title: string; desc: string }> = [
     {
-      icon: <Zap size={15} />,
+      icon: <Flame size={15} />,
       title: 'Live Ritual Rooms',
       desc: 'Co-work with warriors in real-time sessions',
     },
     {
-      icon: <TrendingUp size={15} />,
+      icon: <Shield size={15} />,
       title: 'Momentum Tracking',
       desc: 'Visual streaks that build your identity',
     },
     {
-      icon: <Trophy size={15} />,
+      icon: <Flame size={15} />,
       title: 'Seasonal Challenges',
       desc: 'Compete in ranked public competitions',
     },
