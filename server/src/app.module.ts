@@ -6,7 +6,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { SquadsModule } from './modules/squads/squads.module';
+import { RoomsModule } from './modules/rooms/rooms.module';
+import { ChallengesModule } from './modules/challenges/challenges.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { SquadsModule } from './modules/squads/squads.module';
     }),
     AuthModule,
     UsersModule,
-    SquadsModule,
+    RoomsModule,
+    ChallengesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
