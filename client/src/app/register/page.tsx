@@ -18,20 +18,7 @@ import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
 import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
-import {
-  Mail,
-  Lock,
-  User,
-  Flame,
-  Shield,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Zap,
-  TrendingUp,
-  Trophy,
-} from 'lucide-react';
+import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== COMPONENT ====================
 
@@ -329,9 +316,36 @@ export default function RegisterPage(): JSX.Element {
   );
 }
 
-// ==================== BACKGROUND EFFECTS ====================
+// ==================== LEFT BRANDING PANEL ====================
+//
+// Desktop-only split panel.
+// Contains: logo, headline, 3 feature rows, stats bar at bottom.
 
-const BackgroundEffects: React.FC = (): JSX.Element => {
+const LeftBrandingPanel: React.FC = (): JSX.Element => {
+  const features: Array<{ icon: JSX.Element; title: string; desc: string }> = [
+    {
+      icon: <Flame size={15} />,
+      title: 'Live Ritual Rooms',
+      desc: 'Co-work with warriors in real-time sessions',
+    },
+    {
+      icon: <Shield size={15} />,
+      title: 'Momentum Tracking',
+      desc: 'Visual streaks that build your identity',
+    },
+    {
+      icon: <Flame size={15} />,
+      title: 'Seasonal Challenges',
+      desc: 'Compete in ranked public competitions',
+    },
+  ];
+
+  const stats: Array<{ value: string; label: string }> = [
+    { value: '127K+', label: 'Warriors' },
+    { value: '2.4M', label: 'Streaks' },
+    { value: '94%', label: 'Retention' },
+  ];
+
   return (
     <>
       <div

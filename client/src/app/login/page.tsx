@@ -17,19 +17,7 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
 import { login as loginAPI, type AuthResponse } from '@/api/auth.api';
-import {
-  Mail,
-  Lock,
-  Flame,
-  Shield,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Swords,
-  Target,
-  BicepsFlexed,
-} from 'lucide-react';
+import { Mail, Lock, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== COMPONENT ====================
 
@@ -277,9 +265,44 @@ export default function LoginPage(): JSX.Element {
   );
 }
 
-// ==================== BACKGROUND EFFECTS ====================
+// ==================== LEFT BRANDING PANEL ====================
+//
+// Brand-only content — no user data, no testimonials, no feed.
+//
+// Strategy: "What awaits you inside" — re-engagement focused.
+// 3 value props remind the returning user why they signed up.
+// Different from Register (which sells features to new users).
 
-const BackgroundEffects: React.FC = (): JSX.Element => {
+const LeftBrandingPanel: React.FC = (): JSX.Element => {
+  // Re-engagement value props — brand promises, not user data
+  const valueProps: Array<{
+    icon: JSX.Element;
+    title: string;
+    desc: string;
+  }> = [
+    {
+      icon: <Flame size={15} />,
+      title: "Your Rivals Haven't Stopped",
+      desc: 'Every hour away is ground lost. Get back in the arena.',
+    },
+    {
+      icon: <Shield size={15} />,
+      title: 'Your Streak Is Still Alive',
+      desc: 'Log in before midnight to keep your chain unbroken.',
+    },
+    {
+      icon: <Flame size={15} />,
+      title: 'Your Squad Is Waiting',
+      desc: 'Active rooms and ongoing challenges need your presence.',
+    },
+  ];
+
+  const stats: Array<{ value: string; label: string }> = [
+    { value: '127K+', label: 'Warriors' },
+    { value: '2.4M', label: 'Streaks' },
+    { value: '94%', label: 'Retention' },
+  ];
+
   return (
     <>
       <div
