@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 interface JwtPayload {
@@ -12,15 +12,24 @@ interface JwtPayload {
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(config: ConfigService) {
+    const secret = config.get<string>('JWT_REFRESH_SECRET');
+    if (!secret) {
+      throw new Error('JWT_REFRESH_SECRET is not defined in environment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get<string>('JWT_REFRESH_SECRET') || 'rt-secret', // fallback for dev
+      secretOrKey: secret,
       passReqToCallback: true,
     });
   }
 
   validate(req: Request, payload: JwtPayload) {
-    const refreshToken = req.get('Authorization')!.replace('Bearer', '').trim();
+    const authHeader = req.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Invalid authorization header');
+    }
+    const refreshToken = authHeader.substring(7).trim();
     return { ...payload, refreshToken, userId: payload.sub };
   }
 }
