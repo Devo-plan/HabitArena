@@ -84,7 +84,7 @@ export default function LoginPage(): JSX.Element {
 
   // ── Form Submission ────────────────────────────────────────
   const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Welcome back, warrior! 🔥',
+    successMessage: 'Welcome back, warrior! ',
     onSuccess: (response) => {
       login(response.token, response.user);
       reset();
