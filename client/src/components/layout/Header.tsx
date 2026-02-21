@@ -33,9 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ transparent = false }) => {
     justifyContent: 'space-between',
     padding: `0 ${theme.spacing.xl}`,
     zIndex: theme.zIndex.fixed,
-    backgroundColor: transparent && !scrolled
-      ? 'transparent'
-      : 'rgba(2, 6, 23, 0.8)',
+    backgroundColor: transparent && !scrolled ? 'transparent' : 'rgba(2, 6, 23, 0.8)',
     backdropFilter: 'blur(12px)',
     borderBottom: scrolled ? `1px solid ${theme.colors.border.primary}` : 'none',
     transition: theme.transitions.base,

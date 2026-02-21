@@ -4,7 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import { theme } from '@/styles/theme';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'gradient' | 'victory';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'gradient'
+  | 'victory';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
 interface ButtonLinkProps {

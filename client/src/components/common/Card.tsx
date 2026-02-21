@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { theme } from '@/styles/theme';
 
@@ -32,21 +30,21 @@ export const Card: React.FC<CardProps> = ({
       border: `1px solid ${theme.colors.border.primary}`,
       boxShadow: theme.shadows.elevation.low,
     },
-    
+
     // Elevated: Lifted appearance
     elevated: {
       backgroundColor: theme.colors.background.secondary,
       border: `1px solid ${theme.colors.border.primary}`,
       boxShadow: theme.shadows.elevation.medium,
     },
-    
+
     // Bordered: Strong orange border focus
     bordered: {
       backgroundColor: theme.colors.background.secondary,
       border: `2px solid ${theme.colors.primary[500]}`,
       boxShadow: theme.shadows.glow.orange,
     },
-    
+
     // Glass: Glassmorphism with dark tint
     glass: {
       backgroundColor: theme.colors.background.glass,
@@ -54,14 +52,14 @@ export const Card: React.FC<CardProps> = ({
       backdropFilter: 'blur(16px)',
       boxShadow: theme.shadows.elevation.low,
     },
-    
+
     // Gradient: Orange to red background
     gradient: {
       background: theme.colors.gradients.card,
       border: `1px solid ${theme.colors.border.secondary}`,
       boxShadow: theme.shadows.elevation.low,
     },
-    
+
     // Danger: Red accent for warnings
     danger: {
       backgroundColor: theme.colors.background.danger,
@@ -89,7 +87,7 @@ export const Card: React.FC<CardProps> = ({
       onClick={onClick}
     >
       {children}
-      
+
       {/* Corner accent (competitive detail) */}
       {variant === 'bordered' && (
         <div
@@ -99,13 +97,14 @@ export const Card: React.FC<CardProps> = ({
           }}
         />
       )}
-      
+
       {/* Hover gradient overlay */}
       {hoverable && (
         <div
           className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity pointer-events-none"
           style={{
-            background: 'radial-gradient(circle at top right, rgba(249, 115, 22, 0.15), transparent 60%)',
+            background:
+              'radial-gradient(circle at top right, rgba(249, 115, 22, 0.15), transparent 60%)',
           }}
         />
       )}
@@ -122,12 +121,12 @@ interface CardHeaderProps {
   className?: string;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ 
-  title, 
-  subtitle, 
-  icon, 
+export const CardHeader: React.FC<CardHeaderProps> = ({
+  title,
+  subtitle,
+  icon,
   action,
-  className = '' 
+  className = '',
 }) => {
   return (
     <div className={`flex items-start justify-between mb-4 ${className}`}>
@@ -142,31 +141,23 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
               boxShadow: `0 0 20px ${theme.colors.primary[500]}20`,
             }}
           >
-            <div style={{ color: theme.colors.primary[500] }}>
-              {icon}
-            </div>
+            <div style={{ color: theme.colors.primary[500] }}>{icon}</div>
           </div>
         )}
-        
+
         {/* Text Content */}
         <div>
-          <h3
-            className="text-lg font-bold mb-1"
-            style={{ color: theme.colors.text.primary }}
-          >
+          <h3 className="text-lg font-bold mb-1" style={{ color: theme.colors.text.primary }}>
             {title}
           </h3>
           {subtitle && (
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: theme.colors.text.tertiary }}
-            >
+            <p className="text-sm leading-relaxed" style={{ color: theme.colors.text.tertiary }}>
               {subtitle}
             </p>
           )}
         </div>
       </div>
-      
+
       {/* Action Element */}
       {action}
     </div>

@@ -10,11 +10,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  return (
-    <AppContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={{ theme, setTheme }}>{children}</AppContext.Provider>;
 };
 
 export const useAppContext = () => {

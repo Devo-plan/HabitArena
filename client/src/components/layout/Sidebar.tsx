@@ -3,16 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { theme } from '@/styles/theme';
-import {
-  Home,
-  Target,
-  Trophy,
-  Users,
-  Settings,
-  LogOut,
-  ChevronLeft,
-  Zap,
-} from 'lucide-react';
+import { Home, Target, Trophy, Users, Settings, LogOut, ChevronLeft, Zap } from 'lucide-react';
 
 interface SidebarProps {
   collapsed?: boolean;

@@ -32,5 +32,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "mongod": "^2.0.0"
   }
 }

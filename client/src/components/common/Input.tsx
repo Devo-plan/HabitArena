@@ -1,5 +1,3 @@
-
-
 import React, { forwardRef } from 'react';
 import { theme } from '@/styles/theme';
 
@@ -12,27 +10,18 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ 
-    label, 
-    error, 
-    helperText, 
-    leftIcon, 
-    rightIcon, 
-    className = '', 
-    id,
-    ...props 
-  }, ref) => {
+  ({ label, error, helperText, leftIcon, rightIcon, className = '', id, ...props }, ref) => {
     // Generate unique ID if not provided
     const inputId = id || `input-${label?.toLowerCase().replace(/\s+/g, '-')}`;
 
     // ==================== INPUT STYLES ====================
     const inputStyles: React.CSSProperties = {
       width: '100%',
-      padding: leftIcon 
+      padding: leftIcon
         ? `${theme.spacing.md} ${theme.spacing.md} ${theme.spacing.md} ${theme.spacing['3xl']}`
         : `${theme.spacing.md} ${rightIcon ? theme.spacing['3xl'] : theme.spacing.md} ${theme.spacing.md} ${theme.spacing.md}`,
       backgroundColor: theme.colors.background.tertiary,
-      border: error 
+      border: error
         ? `2px solid ${theme.colors.secondary[500]}`
         : `1px solid ${theme.colors.border.primary}`,
       borderRadius: theme.borderRadius.lg,
@@ -86,13 +75,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               }
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = error 
+              e.currentTarget.style.borderColor = error
                 ? theme.colors.secondary[500]
                 : theme.colors.border.primary;
               e.currentTarget.style.boxShadow = 'none';
             }}
             aria-invalid={error ? 'true' : 'false'}
-            aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+            aria-describedby={
+              error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+            }
             {...props}
           />
 
