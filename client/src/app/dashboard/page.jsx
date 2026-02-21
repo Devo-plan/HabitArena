@@ -5,7 +5,7 @@ export default function DashboardPage() {
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
       <h1>Dashboard</h1>
-      <p>Basic Dashboard – connect Layout and content</p>
+      <p>Basic Dashboard - connect Layout and content</p>
     </main>
   );
 }
