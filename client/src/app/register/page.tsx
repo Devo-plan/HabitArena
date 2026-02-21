@@ -25,7 +25,7 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
-import { register as registerAPI } from '@/api/auth.api';
+import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
 import {
   Mail,
   Lock,
@@ -61,7 +61,7 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, any>(
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthResponse>(
     async (data) => {
       // Call the real auth API
       return await registerAPI(data.email, data.password, data.name);

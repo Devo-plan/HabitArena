@@ -10,7 +10,7 @@ const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').rep
 export interface ApiError {
   message: string;
   status?: number;
-  data?: any;
+  data?: unknown;
 }
 
 // Create axios instance with default config
@@ -25,9 +25,12 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor: Attach auth token to all requests
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // SSR guard: only access localStorage in browser
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -44,18 +47,25 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     // Handle 401 Unauthorized - token expired or invalid
     if (error.response?.status === 401) {
-      // Clear auth data
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Redirect to login if not already there
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+      // SSR guard: only access localStorage in browser
+      if (typeof window !== 'undefined') {
+        // Clear auth data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('refresh_token');
+        // Redirect to login if not already there
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
       }
     }
 
     // Return structured error
     const apiError: ApiError = {
-      message: (error.response?.data as any)?.message || error.message || 'An error occurred',
+      message:
+        (error.response?.data as { message?: string })?.message ||
+        error.message ||
+        'An error occurred',
       status: error.response?.status,
       data: error.response?.data,
     };

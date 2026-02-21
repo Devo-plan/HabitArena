@@ -81,9 +81,11 @@ export const login = async (email: string, password: string): Promise<AuthRespon
 
   const { access_token, refresh_token } = authResponse.data;
 
-  // Store tokens temporarily for the next request
-  localStorage.setItem('token', access_token);
-  localStorage.setItem('refresh_token', refresh_token);
+  // Store tokens temporarily for the next request (SSR guard)
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+  }
 
   // Step 2: Fetch user profile using the access token
   const userProfile = await fetchUserProfile();
@@ -116,9 +118,11 @@ export const register = async (
 
   const { access_token, refresh_token } = authResponse.data;
 
-  // Store tokens temporarily for the next request
-  localStorage.setItem('token', access_token);
-  localStorage.setItem('refresh_token', refresh_token);
+  // Store tokens temporarily for the next request (SSR guard)
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+  }
 
   // Step 2: Fetch user profile using the access token
   const userProfile = await fetchUserProfile();
@@ -144,10 +148,12 @@ export const logout = async (): Promise<void> => {
     // Even if logout fails on server, we still clear local storage
     console.error('Logout error:', error);
   } finally {
-    // Clear local storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
+    // Clear local storage (SSR guard)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+    }
   }
 };
 
@@ -155,6 +161,11 @@ export const logout = async (): Promise<void> => {
  * Refresh access token using refresh token
  */
 export const refreshTokens = async (): Promise<AuthTokensResponse> => {
+  // SSR guard
+  if (typeof window === 'undefined') {
+    throw new Error('refreshTokens can only be called in browser context');
+  }
+
   const refreshToken = localStorage.getItem('refresh_token');
 
   if (!refreshToken) {

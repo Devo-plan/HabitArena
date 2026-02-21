@@ -1,5 +1,4 @@
 import { Flame, Radio, Trophy } from 'lucide-react';
-import { theme } from '@/styles/theme';
 import type { DashboardTab } from '@/shared/types/dashboard.types';
 
 const TABS: { id: DashboardTab; label: string; icon: typeof Flame }[] = [
