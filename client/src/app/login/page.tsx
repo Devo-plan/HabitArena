@@ -25,6 +25,7 @@ import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
+import { login as loginAPI, type AuthResponse } from '@/api/auth.api';
 import {
   Mail,
   Lock,
@@ -38,17 +39,6 @@ import {
   Target,
   BicepsFlexed,
 } from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
 
 // ==================== PAGE ====================
 
@@ -72,29 +62,25 @@ export default function LoginPage(): JSX.Element {
     reset,
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // ── API Call ───────────────────────────────────────────────
-  // TODO: Replace with actual API call when backend is ready
-  const loginAPI = async (data: LoginFormData): Promise<LoginResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-123',
-      user: { id: '123', email: data.email, name: 'Gladiator' },
-    };
-  };
-
   // ── Form Submission ────────────────────────────────────────
-  const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Welcome back, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
-      reset();
-      hidePassword();
-      router.push('/dashboard');
+  const { submit, isLoading } = useAuthSubmit<LoginFormData, AuthResponse>(
+    async (data) => {
+      // Call the real auth API
+      return await loginAPI(data.email, data.password);
     },
-    onError: () => {
-      // Toast error handling managed internally by useAuthSubmit
-    },
-  });
+    {
+      successMessage: 'Welcome back, warrior! 🔥',
+      onSuccess: (response) => {
+        login(response.token, response.user);
+        reset();
+        hidePassword();
+        router.push('/dashboard');
+      },
+      onError: () => {
+        // Toast error handling managed internally by useAuthSubmit
+      },
+    }
+  );
 
   // ── Render ─────────────────────────────────────────────────
   return (
