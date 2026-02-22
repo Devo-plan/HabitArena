@@ -12,7 +12,7 @@
 
 'use client';
 
-import React, { type JSX } from 'react';
+import React, { useRef, type JSX } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -25,7 +25,8 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
-import { authService, extractUserFromToken } from '@/services/auth.service';
+import { authAPI } from '@/api/auth.api';
+import { extractUserFromToken } from '@/services/auth.service';
 import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
@@ -63,8 +64,11 @@ export default function RegisterPage(): JSX.Element {
   const passwordStrength = usePasswordStrength(password);
 
   // ── API Call ───────────────────────────────────────────────
+  const submittedNameRef = useRef('');
+
   const registerAPI = async (data: RegisterFormData): Promise<AuthTokens> => {
-    const response = await authService.register({
+    submittedNameRef.current = data.name;
+    const response = await authAPI.register({
       email: data.email,
       password: data.password,
       displayName: data.name,
@@ -75,7 +79,7 @@ export default function RegisterPage(): JSX.Element {
   const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthTokens>(registerAPI, {
     successMessage: 'Welcome to the arena, warrior!',
     onSuccess: (tokens) => {
-      const user = extractUserFromToken(tokens.access_token);
+      const user = extractUserFromToken(tokens.access_token, submittedNameRef.current);
       if (user) {
         login(
           tokens.access_token,

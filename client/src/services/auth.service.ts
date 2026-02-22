@@ -1,18 +1,7 @@
 // services/auth.service.ts
-// Auth API service — calls backend auth endpoints
+// Auth business logic — token decoding and user extraction
 
-import api from './api';
-import type { AuthTokens, LoginRequest, RegisterRequest, JwtPayload, AuthUser } from '@/types/auth';
-
-// ── API Calls ──────────────────────────────────────────────────
-
-export const authService = {
-  login: (data: LoginRequest) => api.post<AuthTokens>('/auth/login', data),
-
-  register: (data: RegisterRequest) => api.post<AuthTokens>('/auth/register', data),
-};
-
-// ── Token Helpers ──────────────────────────────────────────────
+import type { JwtPayload, AuthUser } from '@/types/auth';
 
 export function decodeJwtPayload(token: string): JwtPayload | null {
   try {

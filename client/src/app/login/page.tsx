@@ -25,7 +25,8 @@ import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
-import { authService, extractUserFromToken } from '@/services/auth.service';
+import { authAPI } from '@/api/auth.api';
+import { extractUserFromToken } from '@/services/auth.service';
 import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
@@ -65,7 +66,7 @@ export default function LoginPage(): JSX.Element {
 
   // ── API Call ───────────────────────────────────────────────
   const loginAPI = async (data: LoginFormData): Promise<AuthTokens> => {
-    const response = await authService.login({
+    const response = await authAPI.login({
       email: data.email,
       password: data.password,
     });
