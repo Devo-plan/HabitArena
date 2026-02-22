@@ -12,7 +12,7 @@
 
 'use client';
 
-import React, { type JSX } from 'react';
+import React, { useRef, type JSX } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -25,8 +25,23 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
-import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
-import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { authAPI } from '@/api/auth.api';
+import { extractUserFromToken } from '@/services/auth.service';
+import type { AuthTokens } from '@/types/auth';
+import {
+  Mail,
+  Lock,
+  User,
+  Flame,
+  Shield,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Zap,
+  TrendingUp,
+  Trophy,
+} from 'lucide-react';
 
 // ==================== PAGE ====================
 
@@ -48,23 +63,37 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthResponse>(
-    async (data) => {
-      // Call the real auth API
-      return await registerAPI(data.email, data.password, data.name);
+  // ── API Call ───────────────────────────────────────────────
+  const submittedNameRef = useRef('');
+
+  const registerAPI = async (data: RegisterFormData): Promise<AuthTokens> => {
+    submittedNameRef.current = data.name;
+    const response = await authAPI.register({
+      email: data.email,
+      password: data.password,
+      displayName: data.name,
+    });
+    return response.data;
+  };
+
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthTokens>(registerAPI, {
+    successMessage: 'Welcome to the arena, warrior!',
+    onSuccess: (tokens) => {
+      const user = extractUserFromToken(tokens.access_token, submittedNameRef.current);
+      if (user) {
+        login(
+          tokens.access_token,
+          { id: user.id, name: user.displayName, email: user.email },
+          tokens.refresh_token
+        );
+      }
+      reset();
+      passwordToggle.hide();
+      confirmPasswordToggle.hide();
+      router.push('/dashboard');
     },
-    {
-      successMessage: 'Welcome to the arena, warrior! 🔥',
-      onSuccess: (response) => {
-        login(response.token, response.user);
-        reset();
-        passwordToggle.hide();
-        confirmPasswordToggle.hide();
-        router.push('/dashboard');
-      },
-      onError: () => {},
-    }
-  );
+    onError: () => {},
+  });
 
   return (
     <div
