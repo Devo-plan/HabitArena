@@ -4,8 +4,16 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, type JSX } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type JSX,
+} from 'react';
 import { useRouter } from 'next/navigation';
+import { authAPI } from '@/api/auth.api';
 
 // ==================== TYPES ====================
 
@@ -19,7 +27,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (token: string, user: User, refreshToken?: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -69,15 +77,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     }
   };
 
-  // Logout Action: Clear session and redirect
-  const logout = () => {
+  // Logout Action: Invalidate server session, clear local state, redirect
+  const logout = useCallback(async () => {
+    try {
+      await authAPI.logout();
+    } catch {
+      // Server invalidation failed (token expired, network error, etc.)
+      // Still clear local state so user can re-login
+    }
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('refresh_token');
     router.push('/login');
-  };
+  }, [router]);
 
   return (
     <AuthContext.Provider

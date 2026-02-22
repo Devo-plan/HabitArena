@@ -8,4 +8,6 @@ export const authAPI = {
   login: (data: LoginRequest) => api.post<AuthTokens>('/auth/login', data),
 
   register: (data: RegisterRequest) => api.post<AuthTokens>('/auth/register', data),
+
+  logout: () => api.post('/auth/logout'),
 };
