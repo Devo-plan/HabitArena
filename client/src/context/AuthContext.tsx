@@ -18,10 +18,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;
+  login: (token: string, user: User, refreshToken?: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
-  isLoading: boolean; // Added loading state to prevent flickering
+  isLoading: boolean;
 }
 
 // ==================== CONTEXT ====================
@@ -47,10 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
         } catch {
-          // Silent fail: Invalid JSON in storage
-          // Kush's feedback: Avoid raw error logging here
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          localStorage.removeItem('refresh_token');
         }
       }
       setIsLoading(false);
@@ -60,11 +59,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   }, []);
 
   // Login Action: Persist session and update state
-  const login = (newToken: string, newUser: User) => {
+  const login = (newToken: string, newUser: User, refreshToken?: string) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(newUser));
+    if (refreshToken) {
+      localStorage.setItem('refresh_token', refreshToken);
+    }
   };
 
   // Logout Action: Clear session and redirect
@@ -73,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('refresh_token');
     router.push('/login');
   };
 

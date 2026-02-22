@@ -25,6 +25,8 @@ import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
+import { authService, extractUserFromToken } from '@/services/auth.service';
+import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
   Lock,
@@ -38,17 +40,6 @@ import {
   Target,
   BicepsFlexed,
 } from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
 
 // ==================== PAGE ====================
 
@@ -73,20 +64,26 @@ export default function LoginPage(): JSX.Element {
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
   // ── API Call ───────────────────────────────────────────────
-  // TODO: Replace with actual API call when backend is ready
-  const loginAPI = async (data: LoginFormData): Promise<LoginResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-123',
-      user: { id: '123', email: data.email, name: 'Gladiator' },
-    };
+  const loginAPI = async (data: LoginFormData): Promise<AuthTokens> => {
+    const response = await authService.login({
+      email: data.email,
+      password: data.password,
+    });
+    return response.data;
   };
 
   // ── Form Submission ────────────────────────────────────────
-  const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Welcome back, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
+  const { submit, isLoading } = useAuthSubmit<LoginFormData, AuthTokens>(loginAPI, {
+    successMessage: 'Welcome back, warrior!',
+    onSuccess: (tokens) => {
+      const user = extractUserFromToken(tokens.access_token);
+      if (user) {
+        login(
+          tokens.access_token,
+          { id: user.id, name: user.displayName, email: user.email },
+          tokens.refresh_token
+        );
+      }
       reset();
       hidePassword();
       router.push('/dashboard');

@@ -25,6 +25,8 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
+import { authService, extractUserFromToken } from '@/services/auth.service';
+import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
   Lock,
@@ -39,17 +41,6 @@ import {
   TrendingUp,
   Trophy,
 } from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface RegisterResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
 
 // ==================== PAGE ====================
 
@@ -71,19 +62,27 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  // TODO: Replace mock with real API call
-  const registerAPI = async (data: RegisterFormData): Promise<RegisterResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-456',
-      user: { id: '123', email: data.email, name: data.name },
-    };
+  // ── API Call ───────────────────────────────────────────────
+  const registerAPI = async (data: RegisterFormData): Promise<AuthTokens> => {
+    const response = await authService.register({
+      email: data.email,
+      password: data.password,
+      displayName: data.name,
+    });
+    return response.data;
   };
 
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
-    successMessage: 'Welcome to the arena, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthTokens>(registerAPI, {
+    successMessage: 'Welcome to the arena, warrior!',
+    onSuccess: (tokens) => {
+      const user = extractUserFromToken(tokens.access_token);
+      if (user) {
+        login(
+          tokens.access_token,
+          { id: user.id, name: user.displayName, email: user.email },
+          tokens.refresh_token
+        );
+      }
       reset();
       passwordToggle.hide();
       confirmPasswordToggle.hide();
