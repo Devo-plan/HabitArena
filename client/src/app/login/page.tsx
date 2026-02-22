@@ -25,6 +25,9 @@ import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
+import { authAPI } from '@/api/auth.api';
+import { extractUserFromToken } from '@/services/auth.service';
+import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
   Lock,
@@ -39,16 +42,208 @@ import {
   BicepsFlexed,
 } from 'lucide-react';
 
-// ==================== TYPES ====================
+// ==================== LEFT BRANDING PANEL ====================
+//
+// Brand-only content — no user data, no testimonials, no feed.
+//
+// Strategy: "What awaits you inside" — re-engagement focused.
+// 3 value props remind the returning user why they signed up.
+// Different from Register (which sells features to new users).
 
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+// Re-engagement value props — brand promises, not user data
+const VALUE_PROPS: Array<{
+  icon: JSX.Element;
+  title: string;
+  desc: string;
+}> = [
+  {
+    icon: <Swords size={15} />,
+    title: "Your Rivals Haven't Stopped",
+    desc: 'Every hour away is ground lost. Get back in the arena.',
+  },
+  {
+    icon: <Target size={15} />,
+    title: 'Your Streak Is Still Alive',
+    desc: 'Log in before midnight to keep your chain unbroken.',
+  },
+  {
+    icon: <BicepsFlexed size={15} />,
+    title: 'Your Squad Is Waiting',
+    desc: 'Active rooms and ongoing challenges need your presence.',
+  },
+];
+
+const LeftBrandingPanel: React.FC = (): JSX.Element => {
+  const stats: Array<{ value: string; label: string }> = [
+    { value: '127K+', label: 'Warriors' },
+    { value: '2.4M', label: 'Streaks' },
+    { value: '94%', label: 'Retention' },
+  ];
+
+  return (
+    <div
+      className="hidden lg:flex flex-col justify-between px-12 py-10 relative overflow-hidden shrink-0"
+      style={{
+        width: '44%',
+        minWidth: '420px',
+        background: 'linear-gradient(150deg, #09090f 0%, #0d0a1a 50%, #09101b 100%)',
+        borderRight: '1px solid rgba(255,255,255,0.05)',
+      }}
+    >
+      {/* Ambient glow: top-left primary */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '-100px',
+          left: '-80px',
+          width: '450px',
+          height: '450px',
+          background: `radial-gradient(circle, ${theme.colors.primary[600]}18 0%, transparent 65%)`,
+          filter: 'blur(70px)',
+        }}
+      />
+
+      {/* Ambient glow: bottom-right secondary */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '-80px',
+          right: '-60px',
+          width: '380px',
+          height: '380px',
+          background: `radial-gradient(circle, ${theme.colors.secondary[600]}12 0%, transparent 65%)`,
+          filter: 'blur(70px)',
+        }}
+      />
+
+      {/* Dot grid texture */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
+        }}
+      />
+
+      {/* ── TOP SECTION ── */}
+      <div className="relative z-10">
+        {/* Logo */}
+        <div className="flex items-center gap-3 mb-14">
+          <div
+            className="p-2.5 rounded-xl shrink-0"
+            style={{
+              background: theme.colors.gradients.primary,
+              boxShadow: `0 4px 20px ${theme.colors.primary[600]}50`,
+            }}
+          >
+            <Flame size={22} color="white" />
+          </div>
+          <span
+            className="text-xl font-black uppercase tracking-widest"
+            style={{ color: theme.colors.text.primary }}
+          >
+            HabitArena
+          </span>
+        </div>
+
+        {/* Headline — returning user context */}
+        <div className="mb-12">
+          <h1
+            className="font-black leading-tight mb-4"
+            style={{
+              color: theme.colors.text.primary,
+              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
+            }}
+          >
+            Your streak
+            <br />
+            is{' '}
+            <span
+              style={{
+                background: theme.colors.gradients.primary,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              waiting.
+            </span>
+          </h1>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: theme.colors.text.muted, maxWidth: '300px' }}
+          >
+            Every minute offline is a minute your rivals are building their lead. The arena never
+            sleeps.
+          </p>
+        </div>
+
+        {/* Value props — re-engagement, zero user data */}
+        <div className="space-y-5">
+          {VALUE_PROPS.map((item) => (
+            <div key={item.title} className="flex items-start gap-4">
+              {/* Icon pill */}
+              <div
+                className="shrink-0 p-2 rounded-lg mt-0.5"
+                style={{
+                  background: `${theme.colors.primary[600]}18`,
+                  border: `1px solid ${theme.colors.primary[600]}30`,
+                  color: theme.colors.primary[400],
+                }}
+              >
+                {item.icon}
+              </div>
+              {/* Text */}
+              <div>
+                <p
+                  className="text-sm font-semibold mb-0.5"
+                  style={{ color: theme.colors.text.primary }}
+                >
+                  {item.title}
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: theme.colors.text.muted }}>
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── BOTTOM: Stats bar ── */}
+      <div
+        className="relative z-10 grid grid-cols-3 rounded-2xl overflow-hidden"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
+        {stats.map((stat, i) => (
+          <div
+            key={stat.label}
+            className="flex flex-col items-center py-4"
+            style={{
+              borderRight: i < stats.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+            }}
+          >
+            <span
+              className="text-xl font-black mb-0.5"
+              style={{
+                background: theme.colors.gradients.primary,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {stat.value}
+            </span>
+            <span className="text-xs font-medium" style={{ color: theme.colors.text.muted }}>
+              {stat.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // ==================== PAGE ====================
 
@@ -73,20 +268,26 @@ export default function LoginPage(): JSX.Element {
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
   // ── API Call ───────────────────────────────────────────────
-  // TODO: Replace with actual API call when backend is ready
-  const loginAPI = async (data: LoginFormData): Promise<LoginResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-123',
-      user: { id: '123', email: data.email, name: 'Gladiator' },
-    };
+  const loginAPI = async (data: LoginFormData): Promise<AuthTokens> => {
+    const response = await authAPI.login({
+      email: data.email,
+      password: data.password,
+    });
+    return response.data;
   };
 
   // ── Form Submission ────────────────────────────────────────
-  const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Welcome back, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
+  const { submit, isLoading } = useAuthSubmit<LoginFormData, AuthTokens>(loginAPI, {
+    successMessage: 'Welcome back, warrior!',
+    onSuccess: (tokens) => {
+      const user = extractUserFromToken(tokens.access_token);
+      if (user) {
+        login(
+          tokens.access_token,
+          { id: user.id, name: user.displayName, email: user.email },
+          tokens.refresh_token
+        );
+      }
       reset();
       hidePassword();
       router.push('/dashboard');
@@ -286,208 +487,7 @@ export default function LoginPage(): JSX.Element {
   );
 }
 
-// ==================== LEFT BRANDING PANEL ====================
-//
-// Brand-only content — no user data, no testimonials, no feed.
-//
-// Strategy: "What awaits you inside" — re-engagement focused.
-// 3 value props remind the returning user why they signed up.
-// Different from Register (which sells features to new users).
-
-const LeftBrandingPanel: React.FC = (): JSX.Element => {
-  // Re-engagement value props — brand promises, not user data
-  const valueProps: Array<{
-    icon: JSX.Element;
-    title: string;
-    desc: string;
-  }> = [
-    {
-      icon: <Swords size={15} />,
-      title: "Your Rivals Haven't Stopped",
-      desc: 'Every hour away is ground lost. Get back in the arena.',
-    },
-    {
-      icon: <Target size={15} />,
-      title: 'Your Streak Is Still Alive',
-      desc: 'Log in before midnight to keep your chain unbroken.',
-    },
-    {
-      icon: <BicepsFlexed size={15} />,
-      title: 'Your Squad Is Waiting',
-      desc: 'Active rooms and ongoing challenges need your presence.',
-    },
-  ];
-
-  const stats: Array<{ value: string; label: string }> = [
-    { value: '127K+', label: 'Warriors' },
-    { value: '2.4M', label: 'Streaks' },
-    { value: '94%', label: 'Retention' },
-  ];
-
-  return (
-    <div
-      className="hidden lg:flex flex-col justify-between px-12 py-10 relative overflow-hidden shrink-0"
-      style={{
-        width: '44%',
-        minWidth: '420px',
-        background: 'linear-gradient(150deg, #09090f 0%, #0d0a1a 50%, #09101b 100%)',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
-      }}
-    >
-      {/* Ambient glow: top-left primary */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '-100px',
-          left: '-80px',
-          width: '450px',
-          height: '450px',
-          background: `radial-gradient(circle, ${theme.colors.primary[600]}18 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-        }}
-      />
-
-      {/* Ambient glow: bottom-right secondary */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '-80px',
-          right: '-60px',
-          width: '380px',
-          height: '380px',
-          background: `radial-gradient(circle, ${theme.colors.secondary[600]}12 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-        }}
-      />
-
-      {/* Dot grid texture */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
-        }}
-      />
-
-      {/* ── TOP SECTION ── */}
-      <div className="relative z-10">
-        {/* Logo */}
-        <div className="flex items-center gap-3 mb-14">
-          <div
-            className="p-2.5 rounded-xl shrink-0"
-            style={{
-              background: theme.colors.gradients.primary,
-              boxShadow: `0 4px 20px ${theme.colors.primary[600]}50`,
-            }}
-          >
-            <Flame size={22} color="white" />
-          </div>
-          <span
-            className="text-xl font-black uppercase tracking-widest"
-            style={{ color: theme.colors.text.primary }}
-          >
-            HabitArena
-          </span>
-        </div>
-
-        {/* Headline — returning user context */}
-        <div className="mb-12">
-          <h1
-            className="font-black leading-tight mb-4"
-            style={{
-              color: theme.colors.text.primary,
-              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
-            }}
-          >
-            Your streak
-            <br />
-            is{' '}
-            <span
-              style={{
-                background: theme.colors.gradients.primary,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              waiting.
-            </span>
-          </h1>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: theme.colors.text.muted, maxWidth: '300px' }}
-          >
-            Every minute offline is a minute your rivals are building their lead. The arena never
-            sleeps.
-          </p>
-        </div>
-
-        {/* Value props — re-engagement, zero user data */}
-        <div className="space-y-5">
-          {valueProps.map((item) => (
-            <div key={item.title} className="flex items-start gap-4">
-              {/* Icon pill */}
-              <div
-                className="shrink-0 p-2 rounded-lg mt-0.5"
-                style={{
-                  background: `${theme.colors.primary[600]}18`,
-                  border: `1px solid ${theme.colors.primary[600]}30`,
-                  color: theme.colors.primary[400],
-                }}
-              >
-                {item.icon}
-              </div>
-              {/* Text */}
-              <div>
-                <p
-                  className="text-sm font-semibold mb-0.5"
-                  style={{ color: theme.colors.text.primary }}
-                >
-                  {item.title}
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: theme.colors.text.muted }}>
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── BOTTOM: Stats bar ── */}
-      <div
-        className="relative z-10 grid grid-cols-3 rounded-2xl overflow-hidden"
-        style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.07)',
-        }}
-      >
-        {stats.map((stat, i) => (
-          <div
-            key={stat.label}
-            className="flex flex-col items-center py-4"
-            style={{
-              borderRight: i < stats.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
-            }}
-          >
-            <span
-              className="text-xl font-black mb-0.5"
-              style={{
-                background: theme.colors.gradients.primary,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              {stat.value}
-            </span>
-            <span className="text-xs font-medium" style={{ color: theme.colors.text.muted }}>
-              {stat.label}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+// ── BOTTOM: Stats bar ──
 
 // ==================== MOBILE LOGO ====================
 // Only shown on mobile — left panel (with logo) is hidden on small screens

@@ -4,8 +4,16 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, type JSX } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type JSX,
+} from 'react';
 import { useRouter } from 'next/navigation';
+import { authAPI } from '@/api/auth.api';
 
 // ==================== TYPES ====================
 
@@ -18,10 +26,10 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;
-  logout: () => void;
+  login: (token: string, user: User, refreshToken?: string) => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
-  isLoading: boolean; // Added loading state to prevent flickering
+  isLoading: boolean;
 }
 
 // ==================== CONTEXT ====================
@@ -47,10 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
           setToken(storedToken);
           setUser(JSON.parse(storedUser));
         } catch {
-          // Silent fail: Invalid JSON in storage
-          // Kush's feedback: Avoid raw error logging here
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          localStorage.removeItem('refresh_token');
         }
       }
       setIsLoading(false);
@@ -60,21 +67,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }): JSX.E
   }, []);
 
   // Login Action: Persist session and update state
-  const login = (newToken: string, newUser: User) => {
+  const login = (newToken: string, newUser: User, refreshToken?: string) => {
     setToken(newToken);
     setUser(newUser);
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(newUser));
+    if (refreshToken) {
+      localStorage.setItem('refresh_token', refreshToken);
+    }
   };
 
-  // Logout Action: Clear session and redirect
-  const logout = () => {
+  // Logout Action: Invalidate server session, clear local state, redirect
+  const logout = useCallback(async () => {
+    try {
+      await authAPI.logout();
+    } catch {
+      // Server invalidation failed (token expired, network error, etc.)
+      // Still clear local state so user can re-login
+    }
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('refresh_token');
     router.push('/login');
-  };
+  }, [router]);
 
   return (
     <AuthContext.Provider

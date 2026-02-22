@@ -12,7 +12,7 @@
 
 'use client';
 
-import React, { type JSX } from 'react';
+import React, { useRef, type JSX } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -25,6 +25,9 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
+import { authAPI } from '@/api/auth.api';
+import { extractUserFromToken } from '@/services/auth.service';
+import type { AuthTokens } from '@/types/auth';
 import {
   Mail,
   Lock,
@@ -40,16 +43,201 @@ import {
   Trophy,
 } from 'lucide-react';
 
-// ==================== TYPES ====================
+// ==================== LEFT BRANDING PANEL ====================
+//
+// Desktop-only split panel.
+// Contains: logo, headline, 3 feature rows, stats bar at bottom.
 
-interface RegisterResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+const FEATURES: Array<{ icon: JSX.Element; title: string; desc: string }> = [
+  {
+    icon: <Zap size={15} />,
+    title: 'Live Ritual Rooms',
+    desc: 'Co-work with warriors in real-time sessions',
+  },
+  {
+    icon: <TrendingUp size={15} />,
+    title: 'Momentum Tracking',
+    desc: 'Visual streaks that build your identity',
+  },
+  {
+    icon: <Trophy size={15} />,
+    title: 'Seasonal Challenges',
+    desc: 'Compete in ranked public competitions',
+  },
+];
+
+const LeftBrandingPanel: React.FC = (): JSX.Element => {
+  const stats: Array<{ value: string; label: string }> = [
+    { value: '127K+', label: 'Warriors' },
+    { value: '2.4M', label: 'Streaks' },
+    { value: '94%', label: 'Retention' },
+  ];
+
+  return (
+    <div
+      className="hidden lg:flex flex-col justify-between px-12 py-10 relative overflow-hidden shrink-0"
+      style={{
+        width: '44%',
+        minWidth: '420px',
+        // Deep dark with warm purple undertone — distinct from right panel
+        background: 'linear-gradient(150deg, #09090f 0%, #0d0a1a 50%, #09101b 100%)',
+        borderRight: '1px solid rgba(255,255,255,0.05)',
+      }}
+    >
+      {/* Ambient glow: top-left purple */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '-100px',
+          left: '-80px',
+          width: '450px',
+          height: '450px',
+          background: `radial-gradient(circle, ${theme.colors.primary[600]}18 0%, transparent 65%)`,
+          filter: 'blur(70px)',
+        }}
+      />
+
+      {/* Ambient glow: bottom-right blue */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '-80px',
+          right: '-60px',
+          width: '380px',
+          height: '380px',
+          background: `radial-gradient(circle, ${theme.colors.secondary[600]}12 0%, transparent 65%)`,
+          filter: 'blur(70px)',
+        }}
+      />
+
+      {/* Dot grid texture — adds premium depth */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
+        }}
+      />
+
+      {/* ── TOP SECTION ── */}
+      <div className="relative z-10">
+        {/* Logo */}
+        <div className="flex items-center gap-3 mb-14">
+          <div
+            className="p-2.5 rounded-xl shrink-0"
+            style={{
+              background: theme.colors.gradients.primary,
+              boxShadow: `0 4px 20px ${theme.colors.primary[600]}50`,
+            }}
+          >
+            <Flame size={22} color="white" />
+          </div>
+          <span
+            className="text-xl font-black uppercase tracking-widest"
+            style={{ color: theme.colors.text.primary }}
+          >
+            HabitArena
+          </span>
+        </div>
+
+        {/* Headline */}
+        <div className="mb-12">
+          <h1
+            className="font-black leading-tight mb-4"
+            style={{
+              color: theme.colors.text.primary,
+              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
+            }}
+          >
+            Turn discipline
+            <br />
+            into your{' '}
+            <span
+              style={{
+                background: theme.colors.gradients.primary,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              superpower.
+            </span>
+          </h1>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: theme.colors.text.muted, maxWidth: '300px' }}
+          >
+            The competitive arena where habits become rivalries, streaks become status, and
+            consistency becomes identity.
+          </p>
+        </div>
+
+        {/* Feature rows */}
+        <div className="space-y-5">
+          {FEATURES.map((feature) => (
+            <div key={feature.title} className="flex items-start gap-4">
+              {/* Icon pill */}
+              <div
+                className="shrink-0 p-2 rounded-lg mt-0.5"
+                style={{
+                  background: `${theme.colors.primary[600]}18`,
+                  border: `1px solid ${theme.colors.primary[600]}30`,
+                  color: theme.colors.primary[400],
+                }}
+              >
+                {feature.icon}
+              </div>
+              {/* Text */}
+              <div>
+                <p
+                  className="text-sm font-semibold mb-0.5"
+                  style={{ color: theme.colors.text.primary }}
+                >
+                  {feature.title}
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: theme.colors.text.muted }}>
+                  {feature.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── BOTTOM: Stats bar ── */}
+      <div
+        className="relative z-10 grid grid-cols-3 rounded-2xl overflow-hidden"
+        style={{
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
+        {stats.map((stat, i) => (
+          <div
+            key={stat.label}
+            className="flex flex-col items-center py-4"
+            style={{
+              borderRight: i < stats.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
+            }}
+          >
+            <span
+              className="text-xl font-black mb-0.5"
+              style={{
+                background: theme.colors.gradients.primary,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {stat.value}
+            </span>
+            <span className="text-xs font-medium" style={{ color: theme.colors.text.muted }}>
+              {stat.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // ==================== PAGE ====================
 
@@ -71,19 +259,30 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  // TODO: Replace mock with real API call
-  const registerAPI = async (data: RegisterFormData): Promise<RegisterResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-456',
-      user: { id: '123', email: data.email, name: data.name },
-    };
+  // ── API Call ───────────────────────────────────────────────
+  const submittedNameRef = useRef('');
+
+  const registerAPI = async (data: RegisterFormData): Promise<AuthTokens> => {
+    submittedNameRef.current = data.name;
+    const response = await authAPI.register({
+      email: data.email,
+      password: data.password,
+      displayName: data.name,
+    });
+    return response.data;
   };
 
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
-    successMessage: 'Welcome to the arena, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthTokens>(registerAPI, {
+    successMessage: 'Welcome to the arena, warrior!',
+    onSuccess: (tokens) => {
+      const user = extractUserFromToken(tokens.access_token, submittedNameRef.current);
+      if (user) {
+        login(
+          tokens.access_token,
+          { id: user.id, name: user.displayName, email: user.email },
+          tokens.refresh_token
+        );
+      }
       reset();
       passwordToggle.hide();
       confirmPasswordToggle.hide();
@@ -291,201 +490,7 @@ export default function RegisterPage(): JSX.Element {
   );
 }
 
-// ==================== LEFT BRANDING PANEL ====================
-//
-// Desktop-only split panel.
-// Contains: logo, headline, 3 feature rows, stats bar at bottom.
-
-const LeftBrandingPanel: React.FC = (): JSX.Element => {
-  const features: Array<{ icon: JSX.Element; title: string; desc: string }> = [
-    {
-      icon: <Zap size={15} />,
-      title: 'Live Ritual Rooms',
-      desc: 'Co-work with warriors in real-time sessions',
-    },
-    {
-      icon: <TrendingUp size={15} />,
-      title: 'Momentum Tracking',
-      desc: 'Visual streaks that build your identity',
-    },
-    {
-      icon: <Trophy size={15} />,
-      title: 'Seasonal Challenges',
-      desc: 'Compete in ranked public competitions',
-    },
-  ];
-
-  const stats: Array<{ value: string; label: string }> = [
-    { value: '127K+', label: 'Warriors' },
-    { value: '2.4M', label: 'Streaks' },
-    { value: '94%', label: 'Retention' },
-  ];
-
-  return (
-    <div
-      className="hidden lg:flex flex-col justify-between px-12 py-10 relative overflow-hidden shrink-0"
-      style={{
-        width: '44%',
-        minWidth: '420px',
-        // Deep dark with warm purple undertone — distinct from right panel
-        background: 'linear-gradient(150deg, #09090f 0%, #0d0a1a 50%, #09101b 100%)',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
-      }}
-    >
-      {/* Ambient glow: top-left purple */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '-100px',
-          left: '-80px',
-          width: '450px',
-          height: '450px',
-          background: `radial-gradient(circle, ${theme.colors.primary[600]}18 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-        }}
-      />
-
-      {/* Ambient glow: bottom-right blue */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '-80px',
-          right: '-60px',
-          width: '380px',
-          height: '380px',
-          background: `radial-gradient(circle, ${theme.colors.secondary[600]}12 0%, transparent 65%)`,
-          filter: 'blur(70px)',
-        }}
-      />
-
-      {/* Dot grid texture — adds premium depth */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
-        }}
-      />
-
-      {/* ── TOP SECTION ── */}
-      <div className="relative z-10">
-        {/* Logo */}
-        <div className="flex items-center gap-3 mb-14">
-          <div
-            className="p-2.5 rounded-xl shrink-0"
-            style={{
-              background: theme.colors.gradients.primary,
-              boxShadow: `0 4px 20px ${theme.colors.primary[600]}50`,
-            }}
-          >
-            <Flame size={22} color="white" />
-          </div>
-          <span
-            className="text-xl font-black uppercase tracking-widest"
-            style={{ color: theme.colors.text.primary }}
-          >
-            HabitArena
-          </span>
-        </div>
-
-        {/* Headline */}
-        <div className="mb-12">
-          <h1
-            className="font-black leading-tight mb-4"
-            style={{
-              color: theme.colors.text.primary,
-              fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
-            }}
-          >
-            Turn discipline
-            <br />
-            into your{' '}
-            <span
-              style={{
-                background: theme.colors.gradients.primary,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              superpower.
-            </span>
-          </h1>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: theme.colors.text.muted, maxWidth: '300px' }}
-          >
-            The competitive arena where habits become rivalries, streaks become status, and
-            consistency becomes identity.
-          </p>
-        </div>
-
-        {/* Feature rows */}
-        <div className="space-y-5">
-          {features.map((feature) => (
-            <div key={feature.title} className="flex items-start gap-4">
-              {/* Icon pill */}
-              <div
-                className="shrink-0 p-2 rounded-lg mt-0.5"
-                style={{
-                  background: `${theme.colors.primary[600]}18`,
-                  border: `1px solid ${theme.colors.primary[600]}30`,
-                  color: theme.colors.primary[400],
-                }}
-              >
-                {feature.icon}
-              </div>
-              {/* Text */}
-              <div>
-                <p
-                  className="text-sm font-semibold mb-0.5"
-                  style={{ color: theme.colors.text.primary }}
-                >
-                  {feature.title}
-                </p>
-                <p className="text-xs leading-relaxed" style={{ color: theme.colors.text.muted }}>
-                  {feature.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── BOTTOM: Stats bar ── */}
-      <div
-        className="relative z-10 grid grid-cols-3 rounded-2xl overflow-hidden"
-        style={{
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.07)',
-        }}
-      >
-        {stats.map((stat, i) => (
-          <div
-            key={stat.label}
-            className="flex flex-col items-center py-4"
-            style={{
-              borderRight: i < stats.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none',
-            }}
-          >
-            <span
-              className="text-xl font-black mb-0.5"
-              style={{
-                background: theme.colors.gradients.primary,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              {stat.value}
-            </span>
-            <span className="text-xs font-medium" style={{ color: theme.colors.text.muted }}>
-              {stat.label}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+// ── BOTTOM: Stats bar ──
 
 // ==================== MOBILE LOGO ====================
 // Shown only on mobile (< lg) since left panel is hidden
