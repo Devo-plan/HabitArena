@@ -67,14 +67,19 @@ describe.skipIf(skipE2E)('Auth (e2e)', () => {
     });
 
     it('should return 400 when email already exists', () => {
+      const duplicateBody = {
+        email: `e2e-duplicate-${Date.now()}@example.com`,
+        password: 'password123',
+        displayName: 'E2E Duplicate',
+      };
       return request(app!.getHttpServer())
         .post('/api/v1/auth/register')
-        .send(validBody)
+        .send(duplicateBody)
         .expect(201)
         .then(() =>
           request(app!.getHttpServer())
             .post('/api/v1/auth/register')
-            .send(validBody)
+            .send(duplicateBody)
             .expect(400)
             .expect((res) => {
               expect(res.body.message).toContain('already exists');
