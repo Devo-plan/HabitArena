@@ -13,7 +13,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.spec.ts', 'test/**/*.e2e-spec.ts'],
+    include: ['src/**/*.spec.ts', 'src/**/*.e2e-spec.ts', 'test/**/*.e2e-spec.ts'],
     server: {
       deps: {
         external: ['@nestjs/common', '@nestjs/core', 'rxjs'],
