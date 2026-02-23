@@ -7,7 +7,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from '../auth.module';
 
-describe('Auth (e2e)', () => {
+// Skip in CI when MongoDB is not available (e.g. in lint-and-test job). Run in test-e2e job with MongoDB service.
+const skipE2E = process.env.CI === 'true' && !process.env.MONGODB_URI;
+
+describe.skipIf(skipE2E)('Auth (e2e)', () => {
   let app: INestApplication | undefined;
 
   beforeAll(async () => {

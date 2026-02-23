@@ -8,6 +8,8 @@
     "start": "nest start",
     "start:prod": "node dist/main",
     "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/*.e2e-spec.ts'",
+    "test:e2e": "vitest run '**/*.e2e-spec.ts'",
     "test:watch": "vitest"
   },
   "dependencies": {
