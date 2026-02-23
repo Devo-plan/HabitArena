@@ -26,6 +26,8 @@ jobs:
 
       - name: Test
         run: npm run test
+        env:
+          CI: 'true'
 
       - name: Build client
         run: npm run build --workspace=client
