@@ -25,30 +25,8 @@ import { loginSchema, type LoginFormData } from '@/utils/validations/auth.schema
 import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { useAuth } from '@/context/AuthContext';
-import {
-  Mail,
-  Lock,
-  Flame,
-  Shield,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Swords,
-  Target,
-  BicepsFlexed,
-} from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+import { login as loginAPI, type AuthResponse } from '@/api/auth.api';
+import { Mail, Lock, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== PAGE ====================
 
@@ -72,29 +50,25 @@ export default function LoginPage(): JSX.Element {
     reset,
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  // ── API Call ───────────────────────────────────────────────
-  // TODO: Replace with actual API call when backend is ready
-  const loginAPI = async (data: LoginFormData): Promise<LoginResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-123',
-      user: { id: '123', email: data.email, name: 'Gladiator' },
-    };
-  };
-
   // ── Form Submission ────────────────────────────────────────
-  const { submit, isLoading } = useAuthSubmit<LoginFormData, LoginResponse>(loginAPI, {
-    successMessage: 'Welcome back, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
-      reset();
-      hidePassword();
-      router.push('/dashboard');
+  const { submit, isLoading } = useAuthSubmit<LoginFormData, AuthResponse>(
+    async (data) => {
+      // Call the real auth API
+      return await loginAPI(data.email, data.password);
     },
-    onError: () => {
-      // Toast error handling managed internally by useAuthSubmit
-    },
-  });
+    {
+      successMessage: 'Welcome back, warrior!',
+      onSuccess: (response) => {
+        login(response.token, response.user);
+        reset();
+        hidePassword();
+        router.push('/dashboard');
+      },
+      onError: () => {
+        // Toast error handling managed internally by useAuthSubmit
+      },
+    }
+  );
 
   // ── Render ─────────────────────────────────────────────────
   return (
@@ -302,17 +276,17 @@ const LeftBrandingPanel: React.FC = (): JSX.Element => {
     desc: string;
   }> = [
     {
-      icon: <Swords size={15} />,
+      icon: <Flame size={15} />,
       title: "Your Rivals Haven't Stopped",
       desc: 'Every hour away is ground lost. Get back in the arena.',
     },
     {
-      icon: <Target size={15} />,
+      icon: <Shield size={15} />,
       title: 'Your Streak Is Still Alive',
       desc: 'Log in before midnight to keep your chain unbroken.',
     },
     {
-      icon: <BicepsFlexed size={15} />,
+      icon: <Flame size={15} />,
       title: 'Your Squad Is Waiting',
       desc: 'Active rooms and ongoing challenges need your presence.',
     },

@@ -899,7 +899,7 @@ const TestimonialsSection: React.FC = () => {
 
             {/* Quote */}
             <p
-              className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 flex-grow"
+              className="text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 grow"
               style={{ color: theme.colors.text.secondary }}
             >
               &ldquo;{testimonial.content}&rdquo;

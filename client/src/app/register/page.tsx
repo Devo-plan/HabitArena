@@ -25,31 +25,8 @@ import { usePasswordToggle } from '@/hooks/usePasswordToggle';
 import { useAuthSubmit } from '@/hooks/useAuthSubmit';
 import { usePasswordStrength } from '@/hooks/usePasswordStrength';
 import { useAuth } from '@/context/AuthContext';
-import {
-  Mail,
-  Lock,
-  User,
-  Flame,
-  Shield,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Zap,
-  TrendingUp,
-  Trophy,
-} from 'lucide-react';
-
-// ==================== TYPES ====================
-
-interface RegisterResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
-}
+import { register as registerAPI, type AuthResponse } from '@/api/auth.api';
+import { Mail, Lock, User, Flame, Shield, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 // ==================== PAGE ====================
 
@@ -71,26 +48,23 @@ export default function RegisterPage(): JSX.Element {
   const password = watch('password') ?? '';
   const passwordStrength = usePasswordStrength(password);
 
-  // TODO: Replace mock with real API call
-  const registerAPI = async (data: RegisterFormData): Promise<RegisterResponse> => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 2000));
-    return {
-      token: 'mock-jwt-token-456',
-      user: { id: '123', email: data.email, name: data.name },
-    };
-  };
-
-  const { submit, isLoading } = useAuthSubmit<RegisterFormData, RegisterResponse>(registerAPI, {
-    successMessage: 'Welcome to the arena, warrior! 🔥',
-    onSuccess: (response) => {
-      login(response.token, response.user);
-      reset();
-      passwordToggle.hide();
-      confirmPasswordToggle.hide();
-      router.push('/dashboard');
+  const { submit, isLoading } = useAuthSubmit<RegisterFormData, AuthResponse>(
+    async (data) => {
+      // Call the real auth API
+      return await registerAPI(data.email, data.password, data.name);
     },
-    onError: () => {},
-  });
+    {
+      successMessage: 'Welcome to the arena, warrior!',
+      onSuccess: (response) => {
+        login(response.token, response.user);
+        reset();
+        passwordToggle.hide();
+        confirmPasswordToggle.hide();
+        router.push('/dashboard');
+      },
+      onError: () => {},
+    }
+  );
 
   return (
     <div
@@ -299,17 +273,17 @@ export default function RegisterPage(): JSX.Element {
 const LeftBrandingPanel: React.FC = (): JSX.Element => {
   const features: Array<{ icon: JSX.Element; title: string; desc: string }> = [
     {
-      icon: <Zap size={15} />,
+      icon: <Flame size={15} />,
       title: 'Live Ritual Rooms',
       desc: 'Co-work with warriors in real-time sessions',
     },
     {
-      icon: <TrendingUp size={15} />,
+      icon: <Shield size={15} />,
       title: 'Momentum Tracking',
       desc: 'Visual streaks that build your identity',
     },
     {
-      icon: <Trophy size={15} />,
+      icon: <Flame size={15} />,
       title: 'Seasonal Challenges',
       desc: 'Compete in ranked public competitions',
     },
