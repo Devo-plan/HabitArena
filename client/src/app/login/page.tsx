@@ -57,7 +57,7 @@ export default function LoginPage(): JSX.Element {
       return await loginAPI(data.email, data.password);
     },
     {
-      successMessage: 'Welcome back, warrior! 🔥',
+      successMessage: 'Welcome back, warrior!',
       onSuccess: (response) => {
         login(response.token, response.user);
         reset();

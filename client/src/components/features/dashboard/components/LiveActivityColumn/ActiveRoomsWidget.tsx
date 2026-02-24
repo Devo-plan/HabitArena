@@ -10,9 +10,7 @@ const AVATAR_COLORS = [
   theme.colors.accent.gold,
   theme.colors.accent.emerald,
 ];
-
 const getAvatarColor = (s: string) => AVATAR_COLORS[s.charCodeAt(0) % AVATAR_COLORS.length];
-
 const OVERFLOW_THRESHOLD = 3;
 
 interface ActiveRoomsWidgetProps {
@@ -26,139 +24,175 @@ export const ActiveRoomsWidget = ({ rooms }: ActiveRoomsWidgetProps) => (
       return (
         <div
           key={room.id}
-          className="hover:border-[rgba(249,115,22,0.25)] transition-colors"
           style={{
             background: theme.colors.background.secondary,
             border: `1px solid ${theme.colors.border.primary}`,
-            borderRadius: theme.borderRadius['2xl'],
-            padding: '18px 20px',
+            borderRadius: '14px',
+            padding: '14px 16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
+            gap: '12px',
+            // Prevent card from exceeding parent width
+            minWidth: 0,
+            overflow: 'hidden',
           }}
         >
-          {/* Row 1: name + live badge */}
+          {/* Row 1: name + status badge */}
           <div
             style={{
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'space-between',
-              gap: '12px',
+              gap: '10px',
+              minWidth: 0,
             }}
           >
-            <div>
+            <div style={{ minWidth: 0, flex: 1 }}>
               <p
                 style={{
                   margin: 0,
-                  fontSize: theme.typography.fontSize.lg,
-                  fontWeight: theme.typography.fontWeight.bold,
+                  fontSize: '15px',
+                  fontWeight: 700,
                   color: theme.colors.text.primary,
-                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.3,
                 }}
               >
                 {room.name}
               </p>
               <p
                 style={{
-                  margin: '3px 0 0',
-                  fontSize: theme.typography.fontSize.xs,
+                  margin: '2px 0 0',
+                  fontSize: '12px',
                   color: theme.colors.text.muted,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {room.hostName} &bull; {room.topic}
               </p>
             </div>
-            {room.status === 'live' ? (
-              <LiveBadge />
-            ) : (
+
+            {/* Status badge — flex-shrink:0 so it never gets crushed */}
+            <div style={{ flexShrink: 0 }}>
+              {room.status === 'live' ? (
+                <LiveBadge />
+              ) : (
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: theme.colors.accent.gold,
+                    background: 'rgba(245,158,11,0.1)',
+                    border: '1px solid rgba(245,158,11,0.25)',
+                    borderRadius: theme.borderRadius.full,
+                    padding: '3px 9px',
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap',
+                    display: 'block',
+                  }}
+                >
+                  Soon
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Row 2: avatars + count | join button */}
+          {/* flex-wrap: wrap so on very narrow screens the button drops below */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              flexWrap: 'wrap',
+              minWidth: 0,
+            }}
+          >
+            {/* Avatar stack + count — grouped so they wrap together */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {/* Overlapping avatars */}
+              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                {room.participantAvatars.slice(0, OVERFLOW_THRESHOLD).map((initials, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      background: getAvatarColor(initials),
+                      border: `2px solid ${theme.colors.background.secondary}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      marginLeft: i > 0 ? '-7px' : '0',
+                      position: 'relative',
+                      zIndex: OVERFLOW_THRESHOLD - i,
+                    }}
+                  >
+                    {initials}
+                  </div>
+                ))}
+                {overflow > 0 && (
+                  <div
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      background: theme.colors.background.tertiary,
+                      border: `2px solid ${theme.colors.background.secondary}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '9px',
+                      fontWeight: 700,
+                      color: theme.colors.text.muted,
+                      marginLeft: '-7px',
+                      position: 'relative',
+                      zIndex: 0,
+                    }}
+                  >
+                    +{overflow}
+                  </div>
+                )}
+              </div>
+
+              {/* Participant count — truncates if needed */}
               <span
                 style={{
-                  fontSize: '11px',
-                  color: theme.colors.accent.gold,
-                  background: 'rgba(245,158,11,0.1)',
-                  border: '1px solid rgba(245,158,11,0.25)',
-                  borderRadius: theme.borderRadius.full,
-                  padding: '3px 10px',
-                  fontWeight: theme.typography.fontWeight.bold,
+                  fontSize: '12px',
+                  color: theme.colors.text.muted,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
                 }}
               >
-                Starting Soon
+                {room.warriorCount}/{room.maxCapacity} participants
               </span>
-            )}
-          </div>
-
-          {/* Row 2: avatar stack + participant count + join button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Overlapping avatars */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              {room.participantAvatars.slice(0, OVERFLOW_THRESHOLD).map((initials, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: getAvatarColor(initials),
-                    border: `2px solid ${theme.colors.background.secondary}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '10px',
-                    fontWeight: theme.typography.fontWeight.bold,
-                    color: '#ffffff',
-                    marginLeft: i > 0 ? '-8px' : '0',
-                    zIndex: OVERFLOW_THRESHOLD - i,
-                    position: 'relative',
-                  }}
-                >
-                  {initials}
-                </div>
-              ))}
-              {overflow > 0 && (
-                <div
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: theme.colors.background.tertiary,
-                    border: `2px solid ${theme.colors.background.secondary}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '10px',
-                    fontWeight: theme.typography.fontWeight.bold,
-                    color: theme.colors.text.muted,
-                    marginLeft: '-8px',
-                    position: 'relative',
-                    zIndex: 0,
-                  }}
-                >
-                  +{overflow}
-                </div>
-              )}
             </div>
 
-            <span
-              style={{
-                fontSize: theme.typography.fontSize.xs,
-                color: theme.colors.text.muted,
-                flex: 1,
-              }}
-            >
-              {room.warriorCount} / {room.maxCapacity} participants
-            </span>
-
-            {/* Join button */}
+            {/* Join button — flexShrink:0 so it never gets squeezed */}
             <Link
               href="/ritual"
-              className="hover:opacity-85 transition-opacity"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
-                padding: '8px 16px',
-                borderRadius: theme.borderRadius.lg,
+                padding: '7px 14px',
+                borderRadius: '8px',
                 background:
                   room.status === 'live'
                     ? theme.colors.gradients.primary
@@ -166,8 +200,8 @@ export const ActiveRoomsWidget = ({ rooms }: ActiveRoomsWidgetProps) => (
                 border:
                   room.status !== 'live' ? `1px solid ${theme.colors.border.primary}` : 'none',
                 color: room.status === 'live' ? '#ffffff' : theme.colors.text.tertiary,
-                fontSize: theme.typography.fontSize.xs,
-                fontWeight: theme.typography.fontWeight.bold,
+                fontSize: '12px',
+                fontWeight: 700,
                 textDecoration: 'none',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
@@ -181,7 +215,7 @@ export const ActiveRoomsWidget = ({ rooms }: ActiveRoomsWidgetProps) => (
           {/* Progress bar */}
           <div
             style={{
-              height: '4px',
+              height: '3px',
               background: theme.colors.background.tertiary,
               borderRadius: theme.borderRadius.full,
               overflow: 'hidden',

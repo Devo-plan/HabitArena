@@ -54,7 +54,7 @@ export default function RegisterPage(): JSX.Element {
       return await registerAPI(data.email, data.password, data.name);
     },
     {
-      successMessage: 'Welcome to the arena, warrior! 🔥',
+      successMessage: 'Welcome to the arena, warrior!',
       onSuccess: (response) => {
         login(response.token, response.user);
         reset();

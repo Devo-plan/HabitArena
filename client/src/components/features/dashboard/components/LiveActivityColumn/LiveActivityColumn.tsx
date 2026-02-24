@@ -20,53 +20,63 @@ export const LiveActivityColumn = () => {
       style={{
         background: 'rgba(26,26,26,0.5)',
         border: `1px solid ${theme.colors.border.primary}`,
-        borderRadius: theme.borderRadius['2xl'],
-        padding: '20px',
+        borderRadius: '16px',
+        padding: '16px',
         height: '100%',
         boxSizing: 'border-box',
+        // Critical for mobile — prevent this column from
+        // expanding beyond the screen width
+        width: '100%',
+        minWidth: 0,
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        gap: '28px',
+        gap: '24px',
       }}
     >
-      <section>
+      {/* Active Rooms */}
+      <section style={{ minWidth: 0 }}>
         <SectionHeader
           title="Active Rooms"
           subtitle="Join others in focused sessions"
           actionLabel="View All"
         />
         {roomsLoading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <SkeletonBlock height="120px" />
-            <SkeletonBlock height="120px" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <SkeletonBlock height="110px" />
+            <SkeletonBlock height="110px" />
           </div>
         ) : (
           <ActiveRoomsWidget rooms={rooms} />
         )}
       </section>
 
-      <section>
+      {/* Challenge hero card */}
+      <section style={{ minWidth: 0 }}>
         {challengeLoading ? (
-          <SkeletonBlock height="240px" />
+          <SkeletonBlock height="220px" />
         ) : (
           <ChallengeProgressCard challenge={challenge} />
         )}
       </section>
 
-      <section>
+      {/* Squad Activity */}
+      <section style={{ minWidth: 0 }}>
         <div
           style={{
             background: theme.colors.background.secondary,
             border: `1px solid ${theme.colors.border.primary}`,
-            borderRadius: theme.borderRadius['2xl'],
-            padding: '18px 20px',
+            borderRadius: '14px',
+            padding: '14px 16px',
+            minWidth: 0,
+            overflow: 'hidden',
           }}
         >
           <SectionHeader title="Squad Activity" />
           {squadLoading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {Array.from({ length: 5 }).map((_, i) => (
-                <SkeletonBlock key={i} height="36px" />
+                <SkeletonBlock key={i} height="34px" />
               ))}
             </div>
           ) : (
@@ -75,9 +85,10 @@ export const LiveActivityColumn = () => {
         </div>
       </section>
 
-      <section>
+      {/* Recent Proofs */}
+      <section style={{ minWidth: 0 }}>
         <SectionHeader title="Recent Proofs" actionLabel="View All" />
-        {squadLoading ? <SkeletonBlock height="208px" /> : <ProofGallery proofs={proofs} />}
+        {squadLoading ? <SkeletonBlock height="200px" /> : <ProofGallery proofs={proofs} />}
       </section>
     </div>
   );

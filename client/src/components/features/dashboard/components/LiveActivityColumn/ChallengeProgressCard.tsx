@@ -19,34 +19,49 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
   return (
     <div
       style={{
-        borderRadius: theme.borderRadius['2xl'],
-        border: `1px solid rgba(249, 115, 22, 0.2)`,
+        borderRadius: '14px',
+        border: '1px solid rgba(249,115,22,0.2)',
         overflow: 'hidden',
         background:
           'linear-gradient(135deg, rgba(30,18,8,0.98) 0%, rgba(45,25,10,0.95) 60%, rgba(249,115,22,0.06) 100%)',
-        padding: '22px 24px',
+        padding: '18px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px',
+        gap: '14px',
+        // Prevent overflow on narrow screens
+        minWidth: 0,
+        boxSizing: 'border-box',
+        width: '100%',
       }}
     >
-      {/* Top row: season + tier badge | time left */}
+      {/* Top row: season+tier | time left — wraps on mobile */}
       <div
         style={{
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          gap: '12px',
+          gap: '10px',
+          flexWrap: 'wrap', // wraps on very narrow screens
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Left: season + tier badge */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+            minWidth: 0,
+          }}
+        >
           <span
             style={{
               fontSize: '11px',
               color: theme.colors.primary[400],
-              fontWeight: theme.typography.fontWeight.bold,
+              fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
+              whiteSpace: 'nowrap',
             }}
           >
             {challenge.season}
@@ -54,22 +69,23 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
           <span
             style={{
               fontSize: '11px',
-              fontWeight: theme.typography.fontWeight.bold,
+              fontWeight: 700,
               color: tierColor,
               background: `${tierColor}15`,
               border: `1px solid ${tierColor}40`,
               borderRadius: theme.borderRadius.full,
-              padding: '2px 10px',
+              padding: '2px 9px',
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
+              whiteSpace: 'nowrap',
             }}
           >
             {challenge.tier} Tier
           </span>
         </div>
 
-        {/* Time left */}
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        {/* Right: time left */}
+        <div style={{ flexShrink: 0 }}>
           <p
             style={{
               margin: 0,
@@ -77,6 +93,7 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
               color: theme.colors.text.muted,
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
+              textAlign: 'right',
             }}
           >
             Time Left
@@ -84,10 +101,12 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
           <p
             style={{
               margin: '2px 0 0',
-              fontSize: theme.typography.fontSize.xl,
-              fontWeight: theme.typography.fontWeight.black,
+              fontSize: '18px',
+              fontWeight: 800,
               fontFamily: theme.typography.fontFamily.display,
               color: theme.colors.text.primary,
+              lineHeight: 1,
+              textAlign: 'right',
             }}
           >
             {challenge.daysRemaining}d 06h
@@ -95,25 +114,31 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
         </div>
       </div>
 
-      {/* Challenge name */}
-      <div>
+      {/* Challenge name + rank */}
+      <div style={{ minWidth: 0 }}>
         <h3
           style={{
             margin: 0,
-            fontSize: theme.typography.fontSize['3xl'],
-            fontWeight: theme.typography.fontWeight.black,
+            // Slightly smaller on mobile via clamp
+            fontSize: 'clamp(20px, 4vw, 28px)',
+            fontWeight: 800,
             fontFamily: theme.typography.fontFamily.display,
             color: theme.colors.text.primary,
             lineHeight: 1.1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {challenge.name}
         </h3>
         <p
           style={{
-            margin: '6px 0 0',
-            fontSize: theme.typography.fontSize.sm,
+            margin: '5px 0 0',
+            fontSize: '13px',
             color: theme.colors.text.tertiary,
+            lineHeight: 1.4,
+            // Allow wrapping here — it's a sentence
           }}
         >
           You are ranked{' '}
@@ -122,25 +147,23 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
         </p>
       </div>
 
-      {/* Progress */}
+      {/* Progress bar */}
       <div>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '8px',
+            marginBottom: '7px',
           }}
         >
-          <span
-            style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.tertiary }}
-          >
+          <span style={{ fontSize: '12px', color: theme.colors.text.tertiary }}>
             Overall Progress
           </span>
           <span
             style={{
-              fontSize: theme.typography.fontSize.lg,
-              fontWeight: theme.typography.fontWeight.black,
+              fontSize: '15px',
+              fontWeight: 800,
               fontFamily: theme.typography.fontFamily.display,
               color: theme.colors.primary[400],
             }}
@@ -150,7 +173,7 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
         </div>
         <div
           style={{
-            height: '8px',
+            height: '6px',
             background: 'rgba(255,255,255,0.06)',
             borderRadius: theme.borderRadius.full,
             overflow: 'hidden',
@@ -162,29 +185,30 @@ export const ChallengeProgressCard = ({ challenge }: ChallengeProgressCardProps)
               width: `${challenge.progressPercent}%`,
               background: theme.colors.gradients.primary,
               borderRadius: theme.borderRadius.full,
-              boxShadow: '0 0 12px rgba(249,115,22,0.5)',
+              boxShadow: '0 0 10px rgba(249,115,22,0.45)',
             }}
           />
         </div>
       </div>
 
-      {/* CTA button */}
+      {/* CTA */}
       <Link
         href="/challenges"
-        className="hover:opacity-90 transition-opacity"
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '12px',
-          borderRadius: theme.borderRadius.xl,
-          background: 'rgba(255,255,255,0.08)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          padding: '11px',
+          borderRadius: '10px',
+          background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(255,255,255,0.11)',
           color: theme.colors.text.primary,
-          fontSize: theme.typography.fontSize.sm,
-          fontWeight: theme.typography.fontWeight.semibold,
+          fontSize: '13px',
+          fontWeight: 600,
           textDecoration: 'none',
-          backdropFilter: 'blur(4px)',
+          // Full width always
+          width: '100%',
+          boxSizing: 'border-box',
         }}
       >
         View Challenge Map
